@@ -7,7 +7,7 @@ namespace game_store_be.Models
 {
     public class GenreModel
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
     }
 }
