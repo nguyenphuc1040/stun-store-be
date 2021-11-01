@@ -47,7 +47,12 @@ namespace game_store_be.Services
 
         public GenreModel EditGenre(GenreModel genre)
         {
-            throw new NotImplementedException();
+            var existGenre = GENRES.SingleOrDefault(x => x.Id == genre.Id);
+            if (existGenre != null)
+            {
+                existGenre.Name = genre.Name;
+            }
+            return existGenre;
         }
 
         public List<GenreModel> GetGenres()

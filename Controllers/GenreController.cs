@@ -1,6 +1,5 @@
 ﻿using game_store_be.Interfaces;
 using game_store_be.Models;
-using game_store_be.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -43,7 +42,7 @@ namespace game_store_be.Controllers
             return Created(HttpContext.Request.Scheme + "://" + HttpContext.Request.Host + HttpContext.Request.Path + "/" + newGenre.Id, newGenre);
         }
         [HttpDelete]
-        [Route("Delete/{id}")]
+        [Route("delete/{id}")]
         public IActionResult DeleteGenre(Guid id)
         {
             GenreModel genre = genreService.GetGenre(id);
@@ -57,5 +56,17 @@ namespace game_store_be.Controllers
 
         }
 
+        [HttpPatch]
+        [Route("update/{id}")]
+        public IActionResult EditGenre(Guid id, GenreModel newGenre)
+        {
+            newGenre.Id = id;
+            GenreModel result = genreService.EditGenre(newGenre);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            return NotFound($"Genre not found");
+        }
     }
 }

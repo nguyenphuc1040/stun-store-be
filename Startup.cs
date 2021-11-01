@@ -30,6 +30,7 @@ namespace game_store_be
             services.AddControllers();
 
             services.AddSingleton<IGenre, GenreService>();
+            services.AddSingleton<IDiscountService, DiscountService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
