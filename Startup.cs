@@ -1,17 +1,13 @@
-using game_store_be.Interfaces;
-using game_store_be.Services;
+using game_store_be.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Pomelo.EntityFrameworkCore.MySql.Storage;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace game_store_be
 {
@@ -27,10 +23,11 @@ namespace game_store_be
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<AppDbContext>(options => options
+               .UseMySql("Server=103.142.139.104;port=3307;Database=maria;User=root;Password=my-secret-pw;port=3307",
+                   mysqlOptions =>
+                       mysqlOptions.ServerVersion(new ServerVersion(new Version(10, 4, 6), ServerType.MariaDb))));
             services.AddControllers();
-
-            services.AddSingleton<IGenre, GenreService>();
-            services.AddSingleton<IDiscountService, DiscountService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
