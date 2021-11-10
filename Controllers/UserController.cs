@@ -34,6 +34,13 @@ namespace game_store_be.Controllers
             _context = context;
         }
         // GET: api/<UserController>
+
+        private Users GetUserByIdService (uint idUser)
+        {
+            var existUser = _context.Users.FirstOrDefault(u => u.Id == idUser);
+            return existUser;
+        }
+
         [HttpGet]
         public IActionResult GetAllUser()
         {
@@ -46,7 +53,7 @@ namespace game_store_be.Controllers
         [HttpGet("{idUser}")]
         public IActionResult GetUserById(uint idUser)
         {
-            var existUser = _context.Users.FirstOrDefault(u => u.Id == idUser);
+            var existUser = GetUserByIdService(idUser);
             if (existUser == null)
             {
                 return NotFound(new { message= "Not found"});
@@ -84,9 +91,19 @@ namespace game_store_be.Controllers
         }
 
         // DELETE api/<UserController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("delete/{idUser}")]
+        public IActionResult DeleteUserById(uint idUser)
         {
+            var existUser = GetUserByIdService(idUser);
+            if (existUser == null)
+            {
+                return NotFound(new { message = "Not found" });
+            }
+
+            _context.Users.Remove(existUser);
+            _context.SaveChanges();
+
+            return Ok(new { message = "Delete success", a = existUser});
         }
     }
 }

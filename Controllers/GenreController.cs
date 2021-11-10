@@ -18,36 +18,70 @@ namespace game_store_be.Controllers
         {
             _context = context;
         }
+
+        private Genres GetGenreByIdService( uint idGenre)
+        {
+            return _context.Genres.FirstOrDefault(u => u.Id == idGenre);
+
+        }
+
         // GET: api/<GenreController>
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult GetGenres()
         {
             return Ok(_context.Genres.ToList());
         }
 
         // GET api/<GenreController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("{idGenre}")]
+        public IActionResult GetGenreById(uint idGenre)
         {
-            return "value";
+            var existGenre = GetGenreByIdService( idGenre);
+            if (existGenre == null)
+            {
+                return NotFound(new { message = "Not found" });
+            }
+            return Ok(existGenre);
         }
 
         // POST api/<GenreController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpPost("create")]
+        public IActionResult CreateNewGenre([FromBody] Genres newGenre)
         {
+            _context.Genres.Add(newGenre);
+            _context.SaveChanges();
+            return Ok(newGenre);
         }
 
         // PUT api/<GenreController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPatch("update/{idGenre}")]
+        public IActionResult UpdateGenreById(uint idGenre, [FromBody] Genres newGenre)
         {
+            Genres existGenre = GetGenreByIdService( idGenre);
+            if (existGenre == null)
+            {
+                return NotFound(new { message = "Not found" });
+            }
+            //newGenre.Id = existGenre.Id;
+
+            existGenre.Name = newGenre.Name;
+            _context.SaveChanges();
+            return Ok( new {a = newGenre.GetType() == existGenre.GetType()});
         }
 
         // DELETE api/<GenreController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("delete/{idGenre}")]
+        public IActionResult DeleteGenreById(uint idGenre)
         {
+            var existGenre = GetGenreByIdService( idGenre);
+            if (existGenre == null)
+            {
+                return NotFound(new { message = "Not found" });
+            }
+            _context.Remove(existGenre);
+            _context.SaveChanges();
+
+            return Ok(new { message = "Delete Success" });
         }
     }
 }

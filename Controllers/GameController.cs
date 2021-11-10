@@ -18,79 +18,50 @@ namespace game_store_be.Controllers
         {
             _context = context;
         }
+        private Games GetGameByIdService(uint idGame)
+        {
+            return _context.Games.FirstOrDefault(g => g.Id == idGame);
+        }
         [HttpGet]
-        public IActionResult GetGames()
+        public IActionResult GetAllGame()
         {
             return Ok( _context.Games.ToList());
         }
 
         // GET: GameController/Details/5
-        public ActionResult Details(int id)
+        [HttpGet("{idGame}")]
+        public IActionResult GetGameById(uint idGame)
         {
-            return View();
+            var existGame = GetGameByIdService(idGame);
+            if (existGame == null)
+            {
+                return NotFound(new { message = "Not found" });
+            }
+
+            return Ok(existGame);
+        }
+        [HttpPost("create")]
+        public IActionResult CreateGame([FromBody] Games newGame)
+        {
+            _context.Games.Add(newGame);
+            _context.SaveChanges();
+
+            return Ok(newGame); 
         }
 
-        // GET: GameController/Create
-        public ActionResult Create()
+        [HttpDelete("delete/{idGame}")]
+        public IActionResult DeleteGameById(uint idGame)
         {
-            return View();
-        }
+            var existGame = GetGameByIdService(idGame);
+            if (existGame == null)
+            {
+                return NotFound(new { message = "Not found" });
+            }
 
-        // POST: GameController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+            _context.Remove(existGame);
+            _context.SaveChanges();
 
-        // GET: GameController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: GameController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: GameController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: GameController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            return Ok(new { message = "Delete Success" });
         }
     }
 }

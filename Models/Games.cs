@@ -29,7 +29,7 @@ namespace game_store_be.Models
         public DateTime? ReleaseDate { get; set; }
         public string Platform { get; set; }
         public int? Cost { get; set; }
-        public uint IdDiscount { get; set; }
+        public uint? IdDiscount { get; set; }
         public string LastestVersion { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
