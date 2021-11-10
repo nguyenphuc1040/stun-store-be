@@ -349,11 +349,11 @@ namespace game_store_be.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("game_versions_idgame_foreign");
 
-                entity.HasOne(d => d.IdGenreNavigation)
-                    .WithMany(p => p.GameVersions)
-                    .HasForeignKey(d => d.IdGenre)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("game_versions_idgenre_foreign");
+                //entity.HasOne(d => d.IdGenreNavigation)
+                //    .WithMany(p => p.GameVersions)
+                //    .HasForeignKey(d => d.IdGenre)
+                //    .OnDelete(DeleteBehavior.ClientSetNull)
+                //    .HasConstraintName("game_versions_idgenre_foreign");
 
                 entity.HasOne(d => d.IdSystemRequirementNavigation)
                     .WithMany(p => p.GameVersions)
@@ -445,11 +445,11 @@ namespace game_store_be.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("games_iddiscount_foreign");
 
-                entity.HasOne(d => d.IdGenreNavigation)
-                    .WithMany(p => p.Games)
-                    .HasForeignKey(d => d.IdGenre)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("games_idgenre_foreign");
+                //entity.HasOne(d => d.IdGenreNavigation)
+                //    .WithMany(p => p.Games)
+                //    .HasForeignKey(d => d.IdGenre)
+                //    .OnDelete(DeleteBehavior.ClientSetNull)
+                //    .HasConstraintName("games_idgenre_foreign");
             });
 
             modelBuilder.Entity<Genres>(entity =>

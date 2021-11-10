@@ -62,3 +62,6 @@ D:\dotnet\game-store-be\game-store-be\bin\Debug\netcoreapp3.1\Microsoft.Bcl.Hash
 D:\dotnet\game-store-be\game-store-be\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Configuration.dll
 D:\dotnet\game-store-be\game-store-be\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Configuration.Binder.dll
 D:\dotnet\game-store-be\game-store-be\bin\Debug\netcoreapp3.1\Pomelo.JsonObject.dll
+D:\dotnet\game-store-be\game-store-be\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.JsonPatch.dll
+D:\dotnet\game-store-be\game-store-be\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+D:\dotnet\game-store-be\game-store-be\bin\Debug\netcoreapp3.1\Newtonsoft.Json.Bson.dll

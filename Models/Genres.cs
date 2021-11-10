@@ -9,16 +9,16 @@ namespace game_store_be.Models
 {
     public partial class Genres
     {
-        public Genres()
-        {
-            GameVersions = new HashSet<GameVersions>();
-            Games = new HashSet<Games>();
-        }
+        //public Genres()
+        //{
+        //    GameVersions = new HashSet<GameVersions>();
+        //    Games = new HashSet<Games>();
+        //}
 
         public uint Id { get; set; }
         public string Name { get; set; }
 
-        public virtual ICollection<GameVersions> GameVersions { get; set; }
-        public virtual ICollection<Games> Games { get; set; }
+        //public virtual ICollection<GameVersions> GameVersions { get; set; }
+        //public virtual ICollection<Games> Games { get; set; }
     }
 }
