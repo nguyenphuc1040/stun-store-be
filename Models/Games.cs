@@ -19,9 +19,9 @@ namespace game_store_be.Models
             WishLists = new HashSet<WishLists>();
         }
 
-        public uint Id { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
-        public uint IdGenre { get; set; }
+        public string IdGenre { get; set; }
         public double? AverageRate { get; set; }
         public int? NumOfRate { get; set; }
         public string Developer { get; set; }
@@ -29,7 +29,7 @@ namespace game_store_be.Models
         public DateTime? ReleaseDate { get; set; }
         public string Platform { get; set; }
         public int? Cost { get; set; }
-        public uint? IdDiscount { get; set; }
+        public string? IdDiscount { get; set; }
         public string LastestVersion { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

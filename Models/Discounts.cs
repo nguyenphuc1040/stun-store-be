@@ -14,7 +14,7 @@ namespace game_store_be.Models
             Games = new HashSet<Games>();
         }
 
-        public uint Id { get; set; }
+        public string Id { get; set; }
         public double? Percent { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }

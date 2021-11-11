@@ -19,7 +19,7 @@ namespace game_store_be.Controllers
             _context = context;
         }
 
-        private Genres GetGenreByIdService( uint idGenre)
+        private Genres GetGenreByIdService( string idGenre)
         {
             return _context.Genres.FirstOrDefault(u => u.Id == idGenre);
 
@@ -34,7 +34,7 @@ namespace game_store_be.Controllers
 
         // GET api/<GenreController>/5
         [HttpGet("{idGenre}")]
-        public IActionResult GetGenreById(uint idGenre)
+        public IActionResult GetGenreById(string idGenre)
         {
             var existGenre = GetGenreByIdService( idGenre);
             if (existGenre == null)
@@ -48,6 +48,7 @@ namespace game_store_be.Controllers
         [HttpPost("create")]
         public IActionResult CreateNewGenre([FromBody] Genres newGenre)
         {
+            newGenre.Id = Guid.NewGuid().ToString();
             _context.Genres.Add(newGenre);
             _context.SaveChanges();
             return Ok(newGenre);
@@ -55,7 +56,7 @@ namespace game_store_be.Controllers
 
         // PUT api/<GenreController>/5
         [HttpPatch("update/{idGenre}")]
-        public IActionResult UpdateGenreById(uint idGenre, [FromBody] Genres newGenre)
+        public IActionResult UpdateGenreById(string idGenre, [FromBody] Genres newGenre)
         {
             Genres existGenre = GetGenreByIdService( idGenre);
             if (existGenre == null)
@@ -71,7 +72,7 @@ namespace game_store_be.Controllers
 
         // DELETE api/<GenreController>/5
         [HttpDelete("delete/{idGenre}")]
-        public IActionResult DeleteGenreById(uint idGenre)
+        public IActionResult DeleteGenreById(string idGenre)
         {
             var existGenre = GetGenreByIdService( idGenre);
             if (existGenre == null)

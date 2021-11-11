@@ -18,7 +18,7 @@ namespace game_store_be.Controllers
         {
             _context = context;
         }
-        private Games GetGameByIdService(uint idGame)
+        private Games GetGameByIdService(string idGame)
         {
             return _context.Games.FirstOrDefault(g => g.Id == idGame);
         }
@@ -30,7 +30,7 @@ namespace game_store_be.Controllers
 
         // GET: GameController/Details/5
         [HttpGet("{idGame}")]
-        public IActionResult GetGameById(uint idGame)
+        public IActionResult GetGameById(string idGame)
         {
             var existGame = GetGameByIdService(idGame);
             if (existGame == null)
@@ -43,6 +43,7 @@ namespace game_store_be.Controllers
         [HttpPost("create")]
         public IActionResult CreateGame([FromBody] Games newGame)
         {
+            newGame.Id = Guid.NewGuid().ToString();
             _context.Games.Add(newGame);
             _context.SaveChanges();
 
@@ -50,7 +51,7 @@ namespace game_store_be.Controllers
         }
 
         [HttpDelete("delete/{idGame}")]
-        public IActionResult DeleteGameById(uint idGame)
+        public IActionResult DeleteGameById(string idGame)
         {
             var existGame = GetGameByIdService(idGame);
             if (existGame == null)

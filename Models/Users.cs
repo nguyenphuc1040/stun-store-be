@@ -17,7 +17,7 @@ namespace game_store_be.Models
             WishLists = new HashSet<WishLists>();
         }
 
-        public uint Id { get; set; }
+        public string Id { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public string DisplayName { get; set; }

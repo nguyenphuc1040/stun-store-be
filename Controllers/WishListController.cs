@@ -34,7 +34,7 @@ namespace game_store_be.Controllers
 
         // GET api/<WishListController>/5
         [HttpGet("{idUser}")]
-        public  IActionResult GetWishListByUser(int idUser)
+        public  IActionResult GetWishListByUser(string idUser)
         {
             var wishList = _context.WishLists.Where(u => u.IdUser == idUser);
             return Ok(wishList);
@@ -42,7 +42,7 @@ namespace game_store_be.Controllers
 
         // POST api/<WishListController>
         [HttpPost("create/{idUser}")]
-        public async Task<IActionResult> CreateNewWishListByUser(uint idUser, [FromBody] uint idGame)
+        public async Task<IActionResult> CreateNewWishListByUser(string idUser, [FromBody] string idGame)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace game_store_be.Controllers
                 WishLists newWishList = new WishLists()
                 {
                     //This is mock
-                    Id = 4,
+                    Id = Guid.NewGuid().ToString(),
                     IdUser = idUser,
                     IdGame = idGame,
                 };
@@ -67,7 +67,7 @@ namespace game_store_be.Controllers
         }
 
         [HttpDelete("delete/{idUser}")]
-        public async Task<IActionResult> DeleteWishListByUser(uint idUser, [FromBody] uint idGame)
+        public async Task<IActionResult> DeleteWishListByUser(string idUser, [FromBody] string idGame)
         {
             WishLists existWishList = await _context.WishLists.FirstOrDefaultAsync (wl => wl.IdUser == idUser && wl.IdGame == idGame);
             if (existWishList != null)

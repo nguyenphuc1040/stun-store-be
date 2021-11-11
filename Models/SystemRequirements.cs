@@ -14,8 +14,8 @@ namespace game_store_be.Models
             GameVersions = new HashSet<GameVersions>();
         }
 
-        public uint Id { get; set; }
-        public uint IdGame { get; set; }
+        public string Id { get; set; }
+        public string IdGame { get; set; }
         public string Processor { get; set; }
         public string Memory { get; set; }
         public string Graphics { get; set; }

@@ -35,7 +35,7 @@ namespace game_store_be.Controllers
         }
         // GET: api/<UserController>
 
-        private Users GetUserByIdService (uint idUser)
+        private Users GetUserByIdService (string idUser)
         {
             var existUser = _context.Users.FirstOrDefault(u => u.Id == idUser);
             return existUser;
@@ -51,7 +51,7 @@ namespace game_store_be.Controllers
 
         // GET api/<UserController>/5
         [HttpGet("{idUser}")]
-        public IActionResult GetUserById(uint idUser)
+        public IActionResult GetUserById(string idUser)
         {
             var existUser = GetUserByIdService(idUser);
             if (existUser == null)
@@ -65,6 +65,7 @@ namespace game_store_be.Controllers
         [HttpPost("register")]
         public IActionResult Register([FromBody] Users newUser)
         {
+            newUser.Id = Guid.NewGuid().ToString();
             newUser.Password = HassPassword(newUser.Password);
 
             _context.Add(newUser);
@@ -92,7 +93,7 @@ namespace game_store_be.Controllers
 
         // DELETE api/<UserController>/5
         [HttpDelete("delete/{idUser}")]
-        public IActionResult DeleteUserById(uint idUser)
+        public IActionResult DeleteUserById(string idUser)
         {
             var existUser = GetUserByIdService(idUser);
             if (existUser == null)
@@ -103,7 +104,7 @@ namespace game_store_be.Controllers
             _context.Users.Remove(existUser);
             _context.SaveChanges();
 
-            return Ok(new { message = "Delete success", a = existUser});
+            return Ok(new { message = "Delete success"});
         }
     }
 }

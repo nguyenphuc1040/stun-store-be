@@ -9,9 +9,9 @@ namespace game_store_be.Models
 {
     public partial class WishLists
     {
-        public uint Id { get; set; }
-        public uint IdUser { get; set; }
-        public uint IdGame { get; set; }
+        public string Id { get; set; }
+        public string IdUser { get; set; }
+        public string IdGame { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 

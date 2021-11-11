@@ -9,18 +9,18 @@ namespace game_store_be.Models
 {
     public partial class GameVersions
     {
-        public uint Id { get; set; }
-        public uint IdGame { get; set; }
+        public string Id { get; set; }
+        public string IdGame { get; set; }
         public string Version { get; set; }
         public string DateUpdate { get; set; }
         public string UrlDownload { get; set; }
-        public uint IdGenre { get; set; }
+        public string IdGenre { get; set; }
         public string MainImage { get; set; }
         public string Thumbnails { get; set; }
         public string ShortDescription { get; set; }
         public string Description { get; set; }
         public string PrivacyPolicy { get; set; }
-        public uint IdSystemRequirement { get; set; }
+        public string IdSystemRequirement { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 

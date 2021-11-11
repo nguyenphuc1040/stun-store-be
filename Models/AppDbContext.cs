@@ -56,7 +56,7 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.ActionPayment)
                     .IsRequired()
@@ -79,11 +79,11 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.IdGame)
                     .HasColumnName("idGame")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255)) unsigned");
 
                 entity.Property(e => e.IdUser)
                     .HasColumnName("idUser")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnName("updated_at")
@@ -114,7 +114,7 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255)) unsigned");
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
@@ -122,11 +122,11 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.IdGame)
                     .HasColumnName("idGame")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.IdUser)
                     .HasColumnName("idUser")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnName("updated_at")
@@ -157,7 +157,7 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.AtDay)
                     .HasColumnName("at_day")
@@ -179,11 +179,11 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.IdGame)
                     .HasColumnName("idGame")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.IdUser)
                     .HasColumnName("idUser")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.Like)
                     .HasColumnName("like")
@@ -235,7 +235,7 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
@@ -273,7 +273,7 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
@@ -293,15 +293,15 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.IdGame)
                     .HasColumnName("idGame")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.IdGenre)
                     .HasColumnName("idGenre")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.IdSystemRequirement)
                     .HasColumnName("idSystemRequirement")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.MainImage)
                     .HasColumnName("mainImage")
@@ -349,11 +349,11 @@ namespace game_store_be.Models
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("game_versions_idgame_foreign");
 
-                //entity.HasOne(d => d.IdGenreNavigation)
-                //    .WithMany(p => p.GameVersions)
-                //    .HasForeignKey(d => d.IdGenre)
-                //    .OnDelete(DeleteBehavior.ClientSetNull)
-                //    .HasConstraintName("game_versions_idgenre_foreign");
+                entity.HasOne(d => d.IdGenreNavigation)
+                    .WithMany(p => p.GameVersions)
+                    .HasForeignKey(d => d.IdGenre)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("game_versions_idgenre_foreign");
 
                 entity.HasOne(d => d.IdSystemRequirementNavigation)
                     .WithMany(p => p.GameVersions)
@@ -374,7 +374,7 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.AverageRate)
                     .HasColumnName("averageRate")
@@ -396,11 +396,11 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.IdDiscount)
                     .HasColumnName("idDiscount")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.IdGenre)
                     .HasColumnName("idGenre")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.LastestVersion)
                     .HasColumnName("lastestVersion")
@@ -458,7 +458,7 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -474,7 +474,7 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.Batch)
                     .HasColumnName("batch")
@@ -556,7 +556,7 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
@@ -570,7 +570,7 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.IdGame)
                     .HasColumnName("idGame")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.Memory)
                     .HasColumnName("memory")
@@ -611,7 +611,7 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.Avatar)
                     .HasColumnName("avatar")
@@ -666,7 +666,7 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
@@ -674,11 +674,11 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.IdGame)
                     .HasColumnName("idGame")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.IdUser)
                     .HasColumnName("idUser")
-                    .HasColumnType("int(10) unsigned");
+                    .HasColumnType("varchar(255) unsigned");
 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnName("updated_at")

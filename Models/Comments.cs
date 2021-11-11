@@ -9,9 +9,9 @@ namespace game_store_be.Models
 {
     public partial class Comments
     {
-        public uint Id { get; set; }
-        public uint IdUser { get; set; }
-        public uint IdGame { get; set; }
+        public string Id { get; set; }
+        public string IdUser { get; set; }
+        public string IdGame { get; set; }
         public string Content { get; set; }
         public DateTime? AtDay { get; set; }
         public double? Rate { get; set; }
