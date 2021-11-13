@@ -14,7 +14,7 @@ namespace game_store_be.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private string HassPassword ( string password)
+        private string HassPassword(string password)
         {
             byte[] salt = new byte[128 / 8];
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
@@ -23,30 +23,25 @@ namespace game_store_be.Controllers
             prf: KeyDerivationPrf.HMACSHA256,
             iterationCount: 100000,
             numBytesRequested: 256 / 8));
-
             return hashed;
-
-
         }
-        private readonly AppDbContext _context;
-        public UserController(AppDbContext context)
+        private readonly game_storeContext _context;
+        public UserController(game_storeContext context)
         {
             _context = context;
         }
         // GET: api/<UserController>
 
-        private Users GetUserByIdService (string idUser)
+        private Users GetUserByIdService(string idUser)
         {
-            var existUser = _context.Users.FirstOrDefault(u => u.Id == idUser);
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
             return existUser;
         }
 
         [HttpGet]
         public IActionResult GetAllUser()
         {
-            var listUser =  _context.Users.ToList();
-
-            return Ok(listUser);
+            return Ok(_context.Users.ToList());
         }
 
         // GET api/<UserController>/5
@@ -56,7 +51,7 @@ namespace game_store_be.Controllers
             var existUser = GetUserByIdService(idUser);
             if (existUser == null)
             {
-                return NotFound(new { message= "Not found"});
+                return NotFound(new { message = "Not found" });
             }
             return Ok(existUser);
         }
@@ -65,7 +60,7 @@ namespace game_store_be.Controllers
         [HttpPost("register")]
         public IActionResult Register([FromBody] Users newUser)
         {
-            newUser.Id = Guid.NewGuid().ToString();
+            newUser.IdUser = Guid.NewGuid().ToString();
             newUser.Password = HassPassword(newUser.Password);
 
             _context.Add(newUser);
@@ -75,7 +70,7 @@ namespace game_store_be.Controllers
 
         [HttpPost("login")]
 
-        public IActionResult Login([FromBody] Login infoLogin )
+        public IActionResult Login([FromBody] Login infoLogin)
         {
             var existUser = _context.Users.FirstOrDefault(u => u.Email == infoLogin.Email && u.Password == HassPassword(infoLogin.Password));
             if (existUser == null)
@@ -89,22 +84,6 @@ namespace game_store_be.Controllers
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
-        }
-
-        // DELETE api/<UserController>/5
-        [HttpDelete("delete/{idUser}")]
-        public IActionResult DeleteUserById(string idUser)
-        {
-            var existUser = GetUserByIdService(idUser);
-            if (existUser == null)
-            {
-                return NotFound(new { message = "Not found" });
-            }
-
-            _context.Users.Remove(existUser);
-            _context.SaveChanges();
-
-            return Ok(new { message = "Delete success"});
         }
     }
 }

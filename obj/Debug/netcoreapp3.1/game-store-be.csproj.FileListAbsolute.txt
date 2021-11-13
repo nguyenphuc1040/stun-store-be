@@ -65,3 +65,5 @@ D:\dotnet\game-store-be\game-store-be\bin\Debug\netcoreapp3.1\Pomelo.JsonObject.
 D:\dotnet\game-store-be\game-store-be\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.JsonPatch.dll
 D:\dotnet\game-store-be\game-store-be\bin\Debug\netcoreapp3.1\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 D:\dotnet\game-store-be\game-store-be\bin\Debug\netcoreapp3.1\Newtonsoft.Json.Bson.dll
+D:\dotnet\game-store-be\game-store-be\bin\Debug\netcoreapp3.1\AutoMapper.dll
+D:\dotnet\game-store-be\game-store-be\bin\Debug\netcoreapp3.1\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

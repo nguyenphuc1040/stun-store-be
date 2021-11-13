@@ -1,10 +1,11 @@
-﻿using game_store_be.Models;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using game_store_be.Dtos;
+using game_store_be.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace game_store_be.Controllers
 {
@@ -12,27 +13,31 @@ namespace game_store_be.Controllers
     [ApiController]
     public class GameController : Controller
     {
-        // GET: GameController
-        private readonly AppDbContext _context;
-        public GameController(AppDbContext context)
+        private readonly game_storeContext _context;
+        private readonly IMapper _mapper;
+
+        public GameController(game_storeContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
-        private Games GetGameByIdService(string idGame)
+        private Game GetGameByIdService(string idGame)
         {
-            return _context.Games.FirstOrDefault(g => g.Id == idGame);
+            return _context.Game.FirstOrDefault(g => g.IdGame == idGame);
         }
         [HttpGet]
         public IActionResult GetAllGame()
         {
-            return Ok( _context.Games.ToList());
+            var games = _context.Game.Include(x => x.IdDiscountNavigation);
+            var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
+            return Ok(gamesDto);
         }
 
         // GET: GameController/Details/5
         [HttpGet("{idGame}")]
         public IActionResult GetGameById(string idGame)
         {
-            var existGame = GetGameByIdService(idGame);
+            var existGame = _context.Game.Where(u => u.IdGame == idGame);
             if (existGame == null)
             {
                 return NotFound(new { message = "Not found" });
@@ -41,13 +46,13 @@ namespace game_store_be.Controllers
             return Ok(existGame);
         }
         [HttpPost("create")]
-        public IActionResult CreateGame([FromBody] Games newGame)
+        public IActionResult CreateGame([FromBody] Game newGame)
         {
-            newGame.Id = Guid.NewGuid().ToString();
-            _context.Games.Add(newGame);
+            newGame.IdGame = Guid.NewGuid().ToString();
+            _context.Game.Add(newGame);
             _context.SaveChanges();
 
-            return Ok(newGame); 
+            return Ok(newGame);
         }
 
         [HttpDelete("delete/{idGame}")]

@@ -1,4 +1,5 @@
 using game_store_be.Models;
+using game_store_be.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -23,11 +24,10 @@ namespace game_store_be
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<AppDbContext>(options => options
-               .UseMySql("Server=103.142.139.104;port=3307;Database=maria;User=root;Password=my-secret-pw;port=3307",
-                   mysqlOptions =>
-                       mysqlOptions.ServerVersion(new ServerVersion(new Version(10, 4, 6), ServerType.MariaDb))));
+            services.AddDbContext<game_storeContext>(options => options
+               .UseSqlServer("Server=103.142.139.104;Database=game_store;User=sa;Password=khai12345@"));
             services.AddControllers();
+            services.AddAutoMapper(typeof(AutoMapProfiles).Assembly);
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
