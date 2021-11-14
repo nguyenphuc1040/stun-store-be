@@ -8,8 +8,12 @@ namespace game_store_be.Utils
     {
         public AutoMapProfiles()
         {
-            CreateMap<Genre, GenreDto>();
+            CreateMap<Genre, GenreDto>().ReverseMap();
             CreateMap<Game, GameDto>();
+            CreateMap<ImageDetail, DiscountDto>().ReverseMap();
+            CreateMap<Users, UserDto>().ReverseMap();
+            CreateMap<DetailGenre, DetailGenreDto>().ReverseMap();
+            CreateMap<ImageGameDetail, ImageGameDetailDto>().ReverseMap();
         }
     }
 }

@@ -28,7 +28,6 @@ namespace game_store_be.Controllers
             return _context.Genre.FirstOrDefault(u => u.IdGenre == idGenre);
         }
 
-        // GET: api/<GenreController>
         [HttpGet]
         public IActionResult GetGenres()
         {
@@ -37,7 +36,6 @@ namespace game_store_be.Controllers
             return Ok(genresDto);
         }
 
-        // GET api/<GenreController>/5
         [HttpGet("{idGenre}")]
         public IActionResult GetGenreById(string idGenre)
         {
@@ -46,20 +44,20 @@ namespace game_store_be.Controllers
             {
                 return NotFound(new { message = "Not found" });
             }
-            return Ok(existGenre);
+            var genreDto = _mapper.Map<Genre, GenreDto>(existGenre);
+            return Ok(genreDto);
         }
 
-        // POST api/<GenreController>
         [HttpPost("create")]
         public IActionResult CreateNewGenre([FromBody] Genre newGenre)
         {
             newGenre.IdGenre = Guid.NewGuid().ToString();
             _context.Genre.Add(newGenre);
             _context.SaveChanges();
-            return Ok(newGenre);
+            var genreDto = _mapper.Map<Genre, GenreDto>(newGenre);
+            return Ok(genreDto);
         }
 
-        // PUT api/<GenreController>/5
         [HttpPatch("update/{idGenre}")]
         public IActionResult UpdateGenreById(string idGenre, [FromBody] Genre newGenre)
         {

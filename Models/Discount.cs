@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace game_store_be.Models
 {
-    public partial class Discount
+    public partial class ImageDetail
     {
-        public Discount()
+        public ImageDetail()
         {
             Game = new HashSet<Game>();
         }

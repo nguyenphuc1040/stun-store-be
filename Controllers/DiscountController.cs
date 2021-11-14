@@ -1,12 +1,12 @@
-﻿using game_store_be.Models;
+﻿using AutoMapper;
+using game_store_be.Dtos;
+using game_store_be.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace game_store_be.Controllers
 {
@@ -15,23 +15,27 @@ namespace game_store_be.Controllers
     public class DiscountController : ControllerBase
     {
         private readonly game_storeContext _context;
-        public DiscountController(game_storeContext context)
+        private readonly IMapper _mapper;
+
+        public DiscountController(game_storeContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
-        // GET: api/<DiscountController>
-        private Discount GetDiscountByIdService(string idDiscount)
+
+        private ImageDetail GetDiscountByIdService(string idDiscount)
         {
             return _context.Discount.FirstOrDefault(dc => dc.IdDiscount == idDiscount);
         }
+
         [HttpGet]
         public IActionResult GetAllDiscount()
         {
-           
-            return Ok(_context.Discount.ToList());
+            var discount = _context.Discount.ToList();
+            var discountDto = _mapper.Map<IEnumerable<DiscountDto>>(discount);
+            return Ok(discountDto);
         }
 
-        // GET api/<DiscountController>/5
         [HttpGet("{idDiscount}")]
         public IActionResult GetDiscountById(string idDiscount)
         {
@@ -40,26 +44,25 @@ namespace game_store_be.Controllers
             {
                 return NotFound(new { message = "Not found" });
             }
-            return Ok(existDiscount);
+            var discountDto  = _mapper.Map<ImageDetail, DiscountDto>(existDiscount);
+            return Ok(discountDto);
         }
 
-        // POST api/<DiscountController>
         [HttpPost("create")]
-        public IActionResult CreateDiscount([FromBody] Discount newDiscount)
+        public IActionResult CreateDiscount([FromBody] ImageDetail newDiscount)
         {
             newDiscount.IdDiscount = Guid.NewGuid().ToString();
             _context.Add(newDiscount);
             _context.SaveChanges();
-            return Ok(newDiscount);
+            var discountDto = _mapper.Map<ImageDetail, DiscountDto>(newDiscount);
+            return Ok(discountDto);
         }
 
-        // PUT api/<DiscountController>/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
 
-        // DELETE api/<DiscountController>/5
         [HttpDelete("delete/{idDiscount}")]
         public IActionResult DeleteDiscountById(string idDiscount)
         {

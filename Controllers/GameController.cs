@@ -23,27 +23,41 @@ namespace game_store_be.Controllers
         }
         private Game GetGameByIdService(string idGame)
         {
-            return _context.Game.FirstOrDefault(g => g.IdGame == idGame);
+            return _context.Game.Include(g => g.IdDiscountNavigation).FirstOrDefault(g => g.IdGame == idGame);
         }
         [HttpGet]
         public IActionResult GetAllGame()
         {
-            var games = _context.Game.Include(x => x.IdDiscountNavigation);
+            var games = _context.Game
+                .Include(x => x.IdDiscountNavigation)
+                .Include(x => x.DetailGenre)
+                    .ThenInclude(x => x.IdGenreNavigation)
+                .Include(x => x.ImageGameDetail);
             var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
+            for (var i = 0; i < games.Count(); i++)
+            {
+                gamesDto.ToList().ElementAt(i).Discount = _mapper.Map<ImageDetail, DiscountDto>(games.ToList().ElementAt(i).IdDiscountNavigation);
+                gamesDto.ToList().ElementAt(i).Genres = _mapper.Map<ICollection<DetailGenreDto>>(games.ToList().ElementAt(i).DetailGenre);
+                //gamesDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(games.ToList().ElementAt(i).ImageGameDetail);
+            }
             return Ok(gamesDto);
         }
 
-        // GET: GameController/Details/5
         [HttpGet("{idGame}")]
         public IActionResult GetGameById(string idGame)
         {
-            var existGame = _context.Game.Where(u => u.IdGame == idGame);
+            var existGame = _context.Game.Where(u => u.IdGame == idGame).Include(u => u.IdDiscountNavigation).Include(x => x.DetailGenre).ThenInclude(x => x.IdGenreNavigation);
             if (existGame == null)
             {
                 return NotFound(new { message = "Not found" });
             }
 
-            return Ok(existGame);
+            var existGameDto = _mapper.Map<IEnumerable<GameDto>>(existGame);
+            existGameDto.First().Discount = _mapper.Map<ImageDetail, DiscountDto>(existGame.First().IdDiscountNavigation);
+            existGameDto.First().Genres = _mapper.Map<ICollection<DetailGenreDto>>(existGame.First().DetailGenre);
+
+
+            return Ok(existGameDto);
         }
         [HttpPost("create")]
         public IActionResult CreateGame([FromBody] Game newGame)
