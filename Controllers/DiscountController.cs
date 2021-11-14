@@ -23,7 +23,7 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
 
-        private ImageDetail GetDiscountByIdService(string idDiscount)
+        private Discount GetDiscountByIdService(string idDiscount)
         {
             return _context.Discount.FirstOrDefault(dc => dc.IdDiscount == idDiscount);
         }
@@ -44,17 +44,17 @@ namespace game_store_be.Controllers
             {
                 return NotFound(new { message = "Not found" });
             }
-            var discountDto  = _mapper.Map<ImageDetail, DiscountDto>(existDiscount);
+            var discountDto  = _mapper.Map<Discount, DiscountDto>(existDiscount);
             return Ok(discountDto);
         }
 
         [HttpPost("create")]
-        public IActionResult CreateDiscount([FromBody] ImageDetail newDiscount)
+        public IActionResult CreateDiscount([FromBody] Discount newDiscount)
         {
             newDiscount.IdDiscount = Guid.NewGuid().ToString();
-            _context.Add(newDiscount);
+            _context.Discount.Add(newDiscount);
             _context.SaveChanges();
-            var discountDto = _mapper.Map<ImageDetail, DiscountDto>(newDiscount);
+            var discountDto = _mapper.Map<Discount, DiscountDto>(newDiscount);
             return Ok(discountDto);
         }
 

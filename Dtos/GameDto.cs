@@ -25,7 +25,8 @@ namespace game_store_be.Dtos
         //public virtual Discount IdDiscountNavigation { get; set; }
         public DiscountDto Discount { get; set; }
         public ICollection<DetailGenreDto> Genres { get; set; }
-        public ICollection<ImageGameDetail> ImageGameDetail { get; set; }
+        public ICollection<ImageGameDetailDto> ImageGameDetail { get; set; }
+        public GameVersionDto NewVersion { get; set; }
 
 
     }

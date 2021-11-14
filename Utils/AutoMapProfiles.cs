@@ -10,10 +10,12 @@ namespace game_store_be.Utils
         {
             CreateMap<Genre, GenreDto>().ReverseMap();
             CreateMap<Game, GameDto>();
-            CreateMap<ImageDetail, DiscountDto>().ReverseMap();
+            CreateMap<Discount, DiscountDto>().ReverseMap();
             CreateMap<Users, UserDto>().ReverseMap();
             CreateMap<DetailGenre, DetailGenreDto>().ReverseMap();
             CreateMap<ImageGameDetail, ImageGameDetailDto>().ReverseMap();
+            CreateMap<SlideGameHot, SlideGameHotDto>().ReverseMap();
+            CreateMap<GameVersion, GameVersionDto>().ReverseMap();
         }
     }
 }

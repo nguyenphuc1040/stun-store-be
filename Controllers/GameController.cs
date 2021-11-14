@@ -36,9 +36,9 @@ namespace game_store_be.Controllers
             var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
             for (var i = 0; i < games.Count(); i++)
             {
-                gamesDto.ToList().ElementAt(i).Discount = _mapper.Map<ImageDetail, DiscountDto>(games.ToList().ElementAt(i).IdDiscountNavigation);
+                gamesDto.ToList().ElementAt(i).Discount = _mapper.Map<Discount, DiscountDto>(games.ToList().ElementAt(i).IdDiscountNavigation);
                 gamesDto.ToList().ElementAt(i).Genres = _mapper.Map<ICollection<DetailGenreDto>>(games.ToList().ElementAt(i).DetailGenre);
-                //gamesDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(games.ToList().ElementAt(i).ImageGameDetail);
+                gamesDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(games.ToList().ElementAt(i).ImageGameDetail);
             }
             return Ok(gamesDto);
         }
@@ -53,7 +53,7 @@ namespace game_store_be.Controllers
             }
 
             var existGameDto = _mapper.Map<IEnumerable<GameDto>>(existGame);
-            existGameDto.First().Discount = _mapper.Map<ImageDetail, DiscountDto>(existGame.First().IdDiscountNavigation);
+            existGameDto.First().Discount = _mapper.Map<Discount, DiscountDto>(existGame.First().IdDiscountNavigation);
             existGameDto.First().Genres = _mapper.Map<ICollection<DetailGenreDto>>(existGame.First().DetailGenre);
 
 

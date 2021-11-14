@@ -38,7 +38,7 @@ namespace game_store_be.Controllers
         public IActionResult CreateImageDetail([FromBody] ImageGameDetail newImageDetail)
         {
             newImageDetail.IdImage = Guid.NewGuid().ToString();
-            _context.Add(newImageDetail);
+            _context.ImageGameDetail.Add(newImageDetail);
             _context.SaveChanges();
             return Ok(newImageDetail);
         }

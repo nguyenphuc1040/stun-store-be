@@ -67,7 +67,7 @@ namespace game_store_be.Controllers
             newUser.IdUser = Guid.NewGuid().ToString();
             newUser.Password = HassPassword(newUser.Password);
 
-            _context.Add(newUser);
+            _context.Users.Add(newUser);
             _context.SaveChanges();
             return Ok(newUser);
         }

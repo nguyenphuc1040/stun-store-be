@@ -19,7 +19,7 @@ namespace game_store_be.Models
         public virtual DbSet<Collection> Collection { get; set; }
         public virtual DbSet<Comments> Comments { get; set; }
         public virtual DbSet<DetailGenre> DetailGenre { get; set; }
-        public virtual DbSet<ImageDetail> Discount { get; set; }
+        public virtual DbSet<Discount> Discount { get; set; }
         public virtual DbSet<Game> Game { get; set; }
         public virtual DbSet<GameVersion> GameVersion { get; set; }
         public virtual DbSet<Genre> Genre { get; set; }
@@ -199,7 +199,7 @@ namespace game_store_be.Models
                     .HasConstraintName("fk_DetailGenre_Genre");
             });
 
-            modelBuilder.Entity<ImageDetail>(entity =>
+            modelBuilder.Entity<Discount>(entity =>
             {
                 entity.HasKey(e => e.IdDiscount)
                     .HasName("pk_Discount");
