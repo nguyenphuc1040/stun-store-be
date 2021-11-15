@@ -22,6 +22,11 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
 
+        private ICollection<Bill> ExistBills (string idUser, string idGame, string action)
+        {
+            return (_context.Bill.Where(b => b.IdUser == idUser && b.IdGame == idGame && b.Actions == action).ToList());
+        }
+
         [HttpGet]
         public IActionResult GetAllBill()
         {
@@ -32,6 +37,21 @@ namespace game_store_be.Controllers
         public IActionResult CreateNewBill([FromBody] Bill newBill )
         {
             newBill.IdBill = Guid.NewGuid().ToString();
+            if (newBill.Actions == "refund")
+            {
+                var existBillPayed = ExistBills(newBill.IdUser, newBill.IdGame, "pay");
+                var existBillRefund = ExistBills(newBill.IdUser, newBill.IdGame, "refund");
+
+                if (existBillPayed.Count() > existBillRefund.Count())
+                {
+                    return Ok("Tra tien");
+                }
+                else
+                {
+                    return Ok("Khong co gi de tra");
+                }
+            }
+
             if (newBill.Actions == null)
             {
                 newBill.Actions = "pay";
