@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using game_store_be.Dtos;
 using game_store_be.Models;
+using System.Collections;
 
 namespace game_store_be.Utils
 {
@@ -16,6 +17,7 @@ namespace game_store_be.Utils
             CreateMap<ImageGameDetail, ImageGameDetailDto>().ReverseMap();
             CreateMap<SlideGameHot, SlideGameHotDto>().ReverseMap();
             CreateMap<GameVersion, GameVersionDto>().ReverseMap();
+            CreateMap<WishList, WishListDto>().ReverseMap();
         }
     }
 }

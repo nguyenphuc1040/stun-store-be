@@ -35,7 +35,7 @@ namespace game_store_be.Controllers
             return hashed;
         }
 
-        private Users GetUserByIdService(string idUser)
+        private Users ExistUser(string idUser)
         {
             var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
             return existUser;
@@ -52,7 +52,7 @@ namespace game_store_be.Controllers
         [HttpGet("{idUser}")]
         public IActionResult GetUserById(string idUser)
         {
-            var existUser = GetUserByIdService(idUser);
+            var existUser = ExistUser(idUser);
             if (existUser == null)
             {
                 return NotFound(new { message = "Not found" });
@@ -83,22 +83,18 @@ namespace game_store_be.Controllers
             return Ok(existUser);
         }
 
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut("update/{idUser}")]
+        public IActionResult UpdateUser (string idUser, [FromBody] UserDto newUser)
         {
-        }
-
-        [HttpDelete("delete/{idUser}")]
-        public IActionResult DeleteUserById(string idUser)
-        {
-            var existUser = GetUserByIdService(idUser);
+            var existUser = ExistUser(idUser);
             if (existUser == null)
             {
-                return NotFound(new { message = "Not found" });
+                return NotFound(new { message ="Not found"});
             }
-            _context.Remove(existUser);
+            newUser.IdUser = existUser.IdUser;
+            _mapper.Map(newUser, existUser);
             _context.SaveChanges();
-            return Ok(new { message = "Delete Success" });
+            return Ok(newUser);
         }
     }
 }

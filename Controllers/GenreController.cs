@@ -58,31 +58,18 @@ namespace game_store_be.Controllers
             return Ok(genreDto);
         }
 
-        [HttpPatch("update/{idGenre}")]
-        public IActionResult UpdateGenreById(string idGenre, [FromBody] Genre newGenre)
+        [HttpPut("update/{idGenre}")]
+        public IActionResult UpdateGenreById(string idGenre, [FromBody] GenreDto newGenre)
         {
             Genre existGenre = GetGenreByIdService(idGenre);
             if (existGenre == null)
             {
                 return NotFound(new { message = "Not found" });
             }
-            //newGenre.Id = existGenre.Id;
-
-            existGenre.NameGenre = newGenre.NameGenre;
+            newGenre.IdGenre = existGenre.IdGenre;
+            _mapper.Map(newGenre ,existGenre);
             _context.SaveChanges();
-            return Ok(new { a = newGenre.GetType() == existGenre.GetType() });
-        }
-        [HttpDelete("delete/{idGenre}")]
-        public IActionResult DeleteGenreById(string idGenre)
-        {
-            Genre existGenre = GetGenreByIdService(idGenre);
-            if (existGenre == null)
-            {
-                return NotFound(new { message = "Not found" });
-            }
-            _context.Remove(existGenre);
-            _context.SaveChanges();
-            return Ok(new { message = "Delete Success" });
+            return Ok(existGenre);
         }
     }
 }

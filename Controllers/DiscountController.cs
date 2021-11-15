@@ -23,7 +23,7 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
 
-        private Discount GetDiscountByIdService(string idDiscount)
+        private Discount ExistDiscount(string idDiscount)
         {
             return _context.Discount.FirstOrDefault(dc => dc.IdDiscount == idDiscount);
         }
@@ -39,7 +39,7 @@ namespace game_store_be.Controllers
         [HttpGet("{idDiscount}")]
         public IActionResult GetDiscountById(string idDiscount)
         {
-            var existDiscount = GetDiscountByIdService(idDiscount);
+            var existDiscount = ExistDiscount(idDiscount);
             if (existDiscount == null)
             {
                 return NotFound(new { message = "Not found" });
@@ -58,23 +58,19 @@ namespace game_store_be.Controllers
             return Ok(discountDto);
         }
 
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut("update/{idDiscount}")]
+        public IActionResult UpdateDiscountById(string idDiscount,[FromBody] DiscountDto newDiscount )
         {
-        }
-
-        [HttpDelete("delete/{idDiscount}")]
-        public IActionResult DeleteDiscountById(string idDiscount)
-        {
-            var existDiscount = GetDiscountByIdService(idDiscount);
+            var existDiscount = ExistDiscount(idDiscount);
             if (existDiscount == null)
             {
-                return NotFound(new { message = "Not Found" });
-
+                return NotFound(new { message = "Not found" });
             }
-            _context.Remove(existDiscount);
+            newDiscount.IdDiscount = existDiscount.IdDiscount;
+            _mapper.Map(newDiscount, existDiscount);
             _context.SaveChanges();
-            return Ok(new { message = "Delete Success" });
+            return Ok(newDiscount);
         }
+
     }
 }

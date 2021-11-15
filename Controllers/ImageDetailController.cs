@@ -47,19 +47,5 @@ namespace game_store_be.Controllers
         public void Put(int id, [FromBody] string value)
         {
         }
-
-        [HttpDelete("delete/{idImageDetail}")]
-        public IActionResult DeleteImageDetailById(string idImageDetail)
-        {
-            var existImageDetail = GetDiscountByIdService(idImageDetail);
-            if (existImageDetail == null)
-            {
-                return NotFound(new { message = "Not Found" });
-
-            }
-            _context.Remove(existImageDetail);
-            _context.SaveChanges();
-            return Ok(new { message = "Delete Success" });
-        }
     }
 }

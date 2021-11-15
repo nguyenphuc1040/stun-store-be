@@ -27,6 +27,7 @@ namespace game_store_be
             services.AddDbContext<game_storeContext>(options => options
                .UseSqlServer("Server=103.142.139.104;Database=game_store;User=sa;Password=khai12345@"));
             services.AddControllers();
+            services.AddCors();
             services.AddAutoMapper(typeof(AutoMapProfiles).Assembly);
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -46,6 +47,8 @@ namespace game_store_be
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseCors(m => m.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
             app.UseEndpoints(endpoints =>
             {

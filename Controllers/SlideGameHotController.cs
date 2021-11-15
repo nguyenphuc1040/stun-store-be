@@ -44,24 +44,5 @@ namespace game_store_be.Controllers
             _context.SaveChanges();
             return Ok(newSlide);
         }
-
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        [HttpDelete("delete/{idGame}")]
-        public IActionResult DeleteSlideGameHotByIdGame(string idGame)
-        {
-            var existSlide = GetSlideGameHotByIdGameService(idGame);
-            if (existSlide == null)
-            {
-                return NotFound(new { message = "Not Found" });
-
-            }
-            _context.Remove(existSlide);
-            _context.SaveChanges();
-            return Ok(new { message = "Delete Success" });
-        }
     }
 }

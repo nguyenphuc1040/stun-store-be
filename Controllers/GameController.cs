@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using game_store_be.CustomModel;
 using game_store_be.Dtos;
 using game_store_be.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -60,28 +61,24 @@ namespace game_store_be.Controllers
             return Ok(existGameDto);
         }
         [HttpPost("create")]
-        public IActionResult CreateGame([FromBody] Game newGame)
+        public IActionResult CreateGame([FromBody] PostGameBody newGameBody)
         {
-            newGame.IdGame = Guid.NewGuid().ToString();
+            var newGame = newGameBody.Game;
+            var newGameVersion = newGameBody.GameVersion;
+
+            var id = Guid.NewGuid().ToString();
+            newGame.IdGame = id;
+            newGameVersion.IdGame = id;
+            newGameVersion.IdGameVersion = Guid.NewGuid().ToString();
+
             _context.Game.Add(newGame);
+            _context.GameVersion.Add(newGameVersion);
             _context.SaveChanges();
 
-            return Ok(newGame);
-        }
+            var newGameDto = _mapper.Map<Game, GameDto>(newGame);
+            var newGameVersionDto = _mapper.Map<Game, GameDto>(newGame);
 
-        [HttpDelete("delete/{idGame}")]
-        public IActionResult DeleteGameById(string idGame)
-        {
-            var existGame = GetGameByIdService(idGame);
-            if (existGame == null)
-            {
-                return NotFound(new { message = "Not found" });
-            }
-
-            _context.Remove(existGame);
-            _context.SaveChanges();
-
-            return Ok(new { message = "Delete Success" });
+            return Ok(new {newGameDto, newGameVersionDto });
         }
     }
 }

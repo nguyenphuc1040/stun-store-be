@@ -54,7 +54,7 @@ namespace game_store_be.Controllers
                 .OrderByDescending(gv => gv.VersionGame)
                 .ToList().ElementAt(0);
             var existGame = _context.Game.First(g => g.IdGame == idGame);
-            var imageDetail = _context.ImageGameDetail.Where(i => i.IdGame == i.IdGame);
+            var imageDetail = _context.ImageGameDetail.Where(i => i.IdGame == idGame);
 
             var existGameversionDto = _mapper.Map<GameVersion, GameVersionDto>(existGameVersion);
             var existGameDto = _mapper.Map<Game, GameDto>(existGame);
@@ -62,9 +62,8 @@ namespace game_store_be.Controllers
             existGameDto.ImageGameDetail = imageDto;
             existGameDto.NewVersion = existGameversionDto;
 
-            return Ok( existGameDto ); 
+            return Ok(existGameDto); 
         }
-
 
     }
 }
