@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using game_store_be.Models;
+using game_store_be.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,13 +32,30 @@ namespace game_store_be.Controllers
         [HttpGet]
         public IActionResult GetAllBill()
         {
-            return Ok(_context.Bill.ToList());
+            var customMapper = new CustomMapper(_mapper);
+            var bills = _context.Bill
+                .Include(b => b.IdGameNavigation)
+                .Include(b => b.IdUserNavigation)
+                .ToList();
+            var billsDto = customMapper.CustomMapListBill(bills);
+            return Ok(billsDto);
         }
 
         [HttpPost("create")]
         public IActionResult CreateNewBill([FromBody] Bill newBill )
         {
             newBill.IdBill = Guid.NewGuid().ToString();
+            var existGame = _context.Game.Include(g => g.IdDiscountNavigation).FirstOrDefault(g => g.IdGame == newBill.IdGame);
+            double cost = 0 ;
+            if (existGame != null)
+            {
+                cost = existGame.IdDiscountNavigation != null 
+                    ? (double)((double)existGame.Cost * (1 - existGame.IdDiscountNavigation.PercentDiscount / 100)) 
+                    : (double)existGame.Cost;
+            }
+
+            newBill.Cost = Math.Ceiling(cost);
+
             if (newBill.Actions == "refund")
             {
                 var existBillPayed = ExistBills(newBill.IdUser, newBill.IdGame, "pay");
@@ -44,7 +63,20 @@ namespace game_store_be.Controllers
 
                 if (existBillPayed.Count() > existBillRefund.Count())
                 {
-                    return Ok("Tra tien");
+                    double? totalCostBillPayed = 0;
+                    double? totalCostBillRefund = 0;
+                    foreach (var item  in existBillPayed )
+                    {
+                        totalCostBillPayed += item.Cost;
+                    }
+                    foreach (var item in existBillRefund)
+                    {
+                        totalCostBillRefund += item.Cost;
+                    }
+                    if (totalCostBillPayed - totalCostBillRefund != newBill.Cost)
+                    {
+                        return Ok("So tien hoan tien khong dung' ");
+                    }
                 }
                 else
                 {
@@ -57,12 +89,7 @@ namespace game_store_be.Controllers
                 newBill.Actions = "pay";
             }
 
-            _context.Bill.Add(newBill);
-            _context.SaveChanges();
-
-            return Ok(newBill);
+            return Ok(cost);
         }
-
-
     }
 }

@@ -18,6 +18,7 @@ namespace game_store_be.Utils
             CreateMap<SlideGameHot, SlideGameHotDto>().ReverseMap();
             CreateMap<GameVersion, GameVersionDto>().ReverseMap();
             CreateMap<WishList, WishListDto>().ReverseMap();
+            CreateMap<Bill, BillDto>().ReverseMap();
         }
     }
 }

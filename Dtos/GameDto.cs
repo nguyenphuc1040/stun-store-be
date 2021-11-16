@@ -10,7 +10,7 @@ namespace game_store_be.Dtos
     {
 
         public string IdGame { get; set; }
-        public string IdDiscount { get; set; }
+        //public string IdDiscount { get; set; }
         public string NameGame { get; set; }
         public double? AverageRate { get; set; }
         public int? NumOfRate { get; set; }

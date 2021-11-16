@@ -71,6 +71,5 @@ namespace game_store_be.Controllers
             _context.SaveChanges();
             return Ok(newDiscount);
         }
-
     }
 }
