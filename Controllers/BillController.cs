@@ -4,6 +4,7 @@ using game_store_be.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,9 +25,9 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
 
-        private ICollection<Bill> ExistBills (string idUser, string idGame, string action)
+        private ICollection<Bill> ExistBills (string idUser, string idGame)
         {
-            return (_context.Bill.Where(b => b.IdUser == idUser && b.IdGame == idGame && b.Actions == action).ToList());
+            return (_context.Bill.Where(b => b.IdUser == idUser && b.IdGame == idGame).ToList());
         }
 
         [HttpGet]
@@ -44,43 +45,40 @@ namespace game_store_be.Controllers
         [HttpPost("create")]
         public IActionResult CreateNewBill([FromBody] Bill newBill )
         {
+            var customMapper = new CustomMapper(_mapper);
             newBill.IdBill = Guid.NewGuid().ToString();
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == newBill.IdUser);
             var existGame = _context.Game.Include(g => g.IdDiscountNavigation).FirstOrDefault(g => g.IdGame == newBill.IdGame);
             double cost = 0 ;
             if (existGame != null)
             {
-                cost = existGame.IdDiscountNavigation != null 
-                    ? (double)((double)existGame.Cost * (1 - existGame.IdDiscountNavigation.PercentDiscount / 100)) 
-                    : (double)existGame.Cost;
+                if (existGame.IdDiscountNavigation != null)
+                {
+                    cost = (double)((double)existGame.Cost * (1 - existGame.IdDiscountNavigation.PercentDiscount / 100));
+                    var billDiscount = _mapper.Map<Discount, BillDiscount>(existGame.IdDiscountNavigation);
+                    newBill.Discount = JsonConvert.SerializeObject(billDiscount);
+                } else
+                {
+                    cost = (double)existGame.Cost;
+                }
             }
 
             newBill.Cost = Math.Ceiling(cost);
+            newBill.DatePay =DateTime.UtcNow;
+            newBill.IdUserNavigation = existUser;
 
             if (newBill.Actions == "refund")
             {
-                var existBillPayed = ExistBills(newBill.IdUser, newBill.IdGame, "pay");
-                var existBillRefund = ExistBills(newBill.IdUser, newBill.IdGame, "refund");
+                var existBill = ExistBills(newBill.IdUser, newBill.IdGame)
+                    .OrderByDescending(b => b.DatePay);
 
-                if (existBillPayed.Count() > existBillRefund.Count())
+                if (existBill != null )
                 {
-                    double? totalCostBillPayed = 0;
-                    double? totalCostBillRefund = 0;
-                    foreach (var item  in existBillPayed )
+                    var firstBill = existBill.ElementAt(0);
+                    if (firstBill.Actions == "pay")
                     {
-                        totalCostBillPayed += item.Cost;
-                    }
-                    foreach (var item in existBillRefund)
-                    {
-                        totalCostBillRefund += item.Cost;
-                    }
-                    if (totalCostBillPayed - totalCostBillRefund != newBill.Cost)
-                    {
-                        return Ok("So tien hoan tien khong dung' ");
-                    }
-                }
-                else
-                {
-                    return Ok("Khong co gi de tra");
+                        newBill.Cost = firstBill.Cost;
+                    } else return Ok("Khong co gi de tra");
                 }
             }
 
@@ -89,7 +87,10 @@ namespace game_store_be.Controllers
                 newBill.Actions = "pay";
             }
 
-            return Ok(cost);
+            _context.Bill.Add(newBill);
+            _context.SaveChanges();
+            var billDto = customMapper.CustomMapBill(newBill);
+            return Ok(billDto);
         }
     }
 }

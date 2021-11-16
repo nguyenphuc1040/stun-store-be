@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using game_store_be.Dtos;
 using game_store_be.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,6 +56,10 @@ namespace game_store_be.Utils
             var billDto = _mapper.Map<Bill, BillDto>(bill);
             billDto.User = userDto;
             billDto.Game = gameDto;
+            if (bill.Discount != null)
+            {
+                billDto.DiscountApplied = JsonConvert.DeserializeObject<BillDiscount>(bill.Discount);
+            }
             return billDto;
         }
         public ICollection<BillDto> CustomMapListBill (ICollection<Bill> bills)
