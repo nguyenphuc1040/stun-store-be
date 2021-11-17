@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace game_store_be.Models
 {
-    public class GenreModel
+    public class Login
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 }
