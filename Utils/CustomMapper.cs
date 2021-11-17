@@ -72,5 +72,23 @@ namespace game_store_be.Utils
             }
             return wishListDto;
         }
+        public CollectionDto CustomMapCollection (Collection collection)
+        {
+            var gameDto = CustomMapGame(collection.IdGameNavigation);
+            var collectionDto = _mapper.Map<Collection, CollectionDto>(collection);
+            collectionDto.Game = gameDto;
+            return collectionDto;
+        }
+
+        public ICollection <CollectionDto> CustomMapListCollection (ICollection<Collection> listCollection)
+        {
+            var listCollectionDto = new List<CollectionDto>();
+            for (var i = 0; i < listCollection.Count(); i++)
+            {
+                var collectionDto = CustomMapCollection(listCollection.ElementAt(i));
+                listCollectionDto.Add(collectionDto);
+            }
+            return listCollectionDto;
+        }
     }
 }
