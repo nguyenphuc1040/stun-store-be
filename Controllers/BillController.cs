@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using game_store_be.Models;
+using game_store_be.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,33 +25,60 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
 
-        private ICollection<Bill> ExistBills (string idUser, string idGame, string action)
+        private ICollection<Bill> ExistBills (string idUser, string idGame)
         {
-            return (_context.Bill.Where(b => b.IdUser == idUser && b.IdGame == idGame && b.Actions == action).ToList());
+            return (_context.Bill.Where(b => b.IdUser == idUser && b.IdGame == idGame).ToList());
         }
 
         [HttpGet]
         public IActionResult GetAllBill()
         {
-            return Ok(_context.Bill.ToList());
+            var customMapper = new CustomMapper(_mapper);
+            var bills = _context.Bill
+                .Include(b => b.IdGameNavigation)
+                .Include(b => b.IdUserNavigation)
+                .ToList();
+            var billsDto = customMapper.CustomMapListBill(bills);
+            return Ok(billsDto);
         }
 
         [HttpPost("create")]
         public IActionResult CreateNewBill([FromBody] Bill newBill )
         {
+            var customMapper = new CustomMapper(_mapper);
             newBill.IdBill = Guid.NewGuid().ToString();
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == newBill.IdUser);
+            var existGame = _context.Game.Include(g => g.IdDiscountNavigation).FirstOrDefault(g => g.IdGame == newBill.IdGame);
+            double cost = 0 ;
+            if (existGame != null)
+            {
+                if (existGame.IdDiscountNavigation != null)
+                {
+                    cost = (double)((double)existGame.Cost * (1 - existGame.IdDiscountNavigation.PercentDiscount / 100));
+                    var billDiscount = _mapper.Map<Discount, BillDiscount>(existGame.IdDiscountNavigation);
+                    newBill.Discount = JsonConvert.SerializeObject(billDiscount);
+                } else
+                {
+                    cost = (double)existGame.Cost;
+                }
+            }
+
+            newBill.Cost = Math.Ceiling(cost);
+            newBill.DatePay =DateTime.UtcNow;
+            newBill.IdUserNavigation = existUser;
+
             if (newBill.Actions == "refund")
             {
-                var existBillPayed = ExistBills(newBill.IdUser, newBill.IdGame, "pay");
-                var existBillRefund = ExistBills(newBill.IdUser, newBill.IdGame, "refund");
+                var existBill = ExistBills(newBill.IdUser, newBill.IdGame)
+                    .OrderByDescending(b => b.DatePay);
 
-                if (existBillPayed.Count() > existBillRefund.Count())
+                if (existBill != null )
                 {
-                    return Ok("Tra tien");
-                }
-                else
-                {
-                    return Ok("Khong co gi de tra");
+                    var firstBill = existBill.ElementAt(0);
+                    if (firstBill.Actions == "pay")
+                    {
+                        newBill.Cost = firstBill.Cost;
+                    } else return Ok("Khong co gi de tra");
                 }
             }
 
@@ -59,10 +89,8 @@ namespace game_store_be.Controllers
 
             _context.Bill.Add(newBill);
             _context.SaveChanges();
-
-            return Ok(newBill);
+            var billDto = customMapper.CustomMapBill(newBill);
+            return Ok(billDto);
         }
-
-
     }
 }

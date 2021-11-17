@@ -35,7 +35,7 @@ namespace game_store_be.Controllers
             return hashed;
         }
 
-        private Users ExistUser(string idUser)
+        public Users ExistUser(string idUser)
         {
             var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
             return existUser;

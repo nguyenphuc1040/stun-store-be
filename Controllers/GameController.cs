@@ -57,7 +57,6 @@ namespace game_store_be.Controllers
             existGameDto.First().Discount = _mapper.Map<Discount, DiscountDto>(existGame.First().IdDiscountNavigation);
             existGameDto.First().Genres = _mapper.Map<ICollection<DetailGenreDto>>(existGame.First().DetailGenre);
 
-
             return Ok(existGameDto);
         }
         [HttpPost("create")]

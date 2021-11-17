@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using game_store_be.Dtos;
 using game_store_be.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,6 +47,48 @@ namespace game_store_be.Utils
                 wishListDto.ToList().ElementAt(i).Game = CustomMapGame(wishList.ToList().ElementAt(i).IdGameNavigation);
             }
             return wishListDto;
+        }
+
+        public BillDto CustomMapBill (Bill bill)
+        {
+            var gameDto = _mapper.Map<Game, GameDto>(bill.IdGameNavigation);
+            var userDto = _mapper.Map<Users, UserDto>(bill.IdUserNavigation);
+            var billDto = _mapper.Map<Bill, BillDto>(bill);
+            billDto.User = userDto;
+            billDto.Game = gameDto;
+            if (bill.Discount != null)
+            {
+                billDto.DiscountApplied = JsonConvert.DeserializeObject<BillDiscount>(bill.Discount);
+            }
+            return billDto;
+        }
+        public ICollection<BillDto> CustomMapListBill (ICollection<Bill> bills)
+        {
+            var wishListDto = new List<BillDto>();
+            for (var i = 0; i < bills.Count(); i++)
+            {
+                var billDto = CustomMapBill(bills.ElementAt(i));
+                wishListDto.Add(billDto);
+            }
+            return wishListDto;
+        }
+        public CollectionDto CustomMapCollection (Collection collection)
+        {
+            var gameDto = CustomMapGame(collection.IdGameNavigation);
+            var collectionDto = _mapper.Map<Collection, CollectionDto>(collection);
+            collectionDto.Game = gameDto;
+            return collectionDto;
+        }
+
+        public ICollection <CollectionDto> CustomMapListCollection (ICollection<Collection> listCollection)
+        {
+            var listCollectionDto = new List<CollectionDto>();
+            for (var i = 0; i < listCollection.Count(); i++)
+            {
+                var collectionDto = CustomMapCollection(listCollection.ElementAt(i));
+                listCollectionDto.Add(collectionDto);
+            }
+            return listCollectionDto;
         }
     }
 }

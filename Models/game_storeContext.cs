@@ -74,6 +74,12 @@ namespace game_store_be.Models
                     .IsUnicode(false)
                     .HasColumnType("varchar(50) unsigned");
 
+                entity.Property(e => e.Discount)
+                    .HasColumnName("discount")
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnType("varchar(100)");
+
 
                 entity.HasOne(d => d.IdGameNavigation)
                     .WithMany(p => p.Bill)
