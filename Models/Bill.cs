@@ -9,7 +9,7 @@ namespace game_store_be.Models
         public string IdGame { get; set; }
         public string IdUser { get; set; }
         public DateTime? DatePay { get; set; }
-        public double? Cost { get; set; }
+        public double Cost { get; set; }
         public string Actions { get; set; }
         public string Discount { get; set; }
 
