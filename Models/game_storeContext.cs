@@ -508,6 +508,10 @@ namespace game_store_be.Models
                     .HasColumnName("userName")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+                entity.Property(e => e.Roles)
+                    .HasColumnName("roles")
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<WishList>(entity =>

@@ -49,7 +49,7 @@ namespace game_store_be.Controllers
             return Ok(genreDto);
         }
 
-        [Authorize]
+        [Authorize(Roles ="admin")]
         [HttpPost("create")]
         public IActionResult CreateNewGenre([FromBody] Genre newGenre)
         {
@@ -60,7 +60,7 @@ namespace game_store_be.Controllers
             return Ok(genreDto);
         }
 
-        [Authorize]
+        [Authorize(Roles = "admin")]
         [HttpPut("update/{idGenre}")]
         public IActionResult UpdateGenreById(string idGenre, [FromBody] GenreDto newGenre)
         {

@@ -31,7 +31,7 @@ namespace game_store_be.Controllers
             return Ok(gamesVersions);
         }
 
-        [Authorize]
+        [Authorize( Roles ="admin" ) ]
         [HttpPost("create")]
         public IActionResult CreateGameVersion([FromBody] GameVersion newGameVersion )
         {
@@ -41,7 +41,7 @@ namespace game_store_be.Controllers
             return Ok(newGameVersion);
         }
 
-        [Authorize]
+        [Authorize(Roles = "admin") ]
         [HttpGet("by-game/{idGame}")]
         public IActionResult GetVersionByIdGame(string idGame)
         {

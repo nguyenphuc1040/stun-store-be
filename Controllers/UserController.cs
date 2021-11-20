@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace game_store_be.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -53,6 +53,7 @@ namespace game_store_be.Controllers
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.IdUser),
+                new Claim(ClaimTypes.Role, user.Roles),
             };
 
             var signingCredentials = new SigningCredentials(
@@ -61,7 +62,7 @@ namespace game_store_be.Controllers
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(1),
+                Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = signingCredentials
             };
 
@@ -102,6 +103,7 @@ namespace game_store_be.Controllers
         {
             newUser.IdUser = Guid.NewGuid().ToString();
             newUser.Password = HassPassword(newUser.Password);
+            newUser.Roles = "user";
 
             _context.Users.Add(newUser);
             _context.SaveChanges();

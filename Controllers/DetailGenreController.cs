@@ -31,7 +31,7 @@ namespace game_store_be.Controllers
             return Ok(detailGenres);
         }
 
-        [Authorize]
+        [Authorize(Roles ="admin")]
         [HttpPost("create")]
         public IActionResult CreateDetailGenre([FromBody] DetailGenre newDetailGenre )
         {

@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace game_store_be.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class BillController : ControllerBase
@@ -39,6 +38,7 @@ namespace game_store_be.Controllers
             return (_context.Bill.Where(b => b.IdUser == idUser && b.IdGame == idGame).ToList());
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public IActionResult GetAllBill()
         {
@@ -51,8 +51,7 @@ namespace game_store_be.Controllers
             return Ok(billsDto);
         }
 
-
-
+        [Authorize(Roles = "admin, user")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateNewBill([FromBody] PostBillBody billBody)
         {

@@ -38,7 +38,7 @@ namespace game_store_be.Controllers
             return Ok(slideGameHotDtos);
         }
 
-        [Authorize]
+        [Authorize(Roles = "admin")]
         [HttpPost("create")]
         public IActionResult CreateSlideGameHot([FromBody] SlideGameHot newSlide)
         {

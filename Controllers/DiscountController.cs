@@ -49,7 +49,7 @@ namespace game_store_be.Controllers
             return Ok(discountDto);
         }
 
-        [Authorize]
+        [Authorize(Roles ="admin")]
         [HttpPost("create")]
         public IActionResult CreateDiscount([FromBody] Discount newDiscount)
         {
