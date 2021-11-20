@@ -14,9 +14,11 @@ using System.Net.Http.Headers;
 using System.Text;
 using game_store_be.CustomModel;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace game_store_be.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class BillController : ControllerBase

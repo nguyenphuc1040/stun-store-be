@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using game_store_be.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,7 @@ namespace game_store_be.Controllers
             return Ok(detailGenres);
         }
 
+        [Authorize]
         [HttpPost("create")]
         public IActionResult CreateDetailGenre([FromBody] DetailGenre newDetailGenre )
         {

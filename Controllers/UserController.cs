@@ -1,26 +1,36 @@
 ﻿using AutoMapper;
+using game_store_be.CustomModel;
 using game_store_be.Dtos;
 using game_store_be.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace game_store_be.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {
         private readonly game_storeContext _context;
         private readonly IMapper _mapper;
-        public UserController(game_storeContext context, IMapper mapper)
+        private readonly IConfiguration _config;
+        public UserController(game_storeContext context, IMapper mapper, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
+            _config = configuration;
         }
 
         private string HassPassword(string password)
@@ -33,6 +43,31 @@ namespace game_store_be.Controllers
             iterationCount: 100000,
             numBytesRequested: 256 / 8));
             return hashed;
+        }
+
+        private string CreateJWT(Users user) {
+
+            var secretKey = _config.GetSection("AppSettings:Key").Value;
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var claims = new Claim[]
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.IdUser),
+            };
+
+            var signingCredentials = new SigningCredentials(
+                    key, SecurityAlgorithms.HmacSha256Signature
+            );
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(1),
+                SigningCredentials = signingCredentials
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
 
         public Users ExistUser(string idUser)
@@ -61,6 +96,7 @@ namespace game_store_be.Controllers
             return Ok(userDto);
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
         public IActionResult Register([FromBody] Users newUser)
         {
@@ -72,6 +108,7 @@ namespace game_store_be.Controllers
             return Ok(newUser);
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public IActionResult Login([FromBody] Login infoLogin)
         {
@@ -80,7 +117,11 @@ namespace game_store_be.Controllers
             {
                 return NotFound(new { message = "Info login is incorrect" });
             }
-            return Ok(existUser);
+
+            var loginRes = new LoginRes();
+            loginRes.Username = existUser.UserName;
+            loginRes.Token = CreateJWT(existUser);
+            return Ok(loginRes);
         }
 
         [HttpPut("update/{idUser}")]

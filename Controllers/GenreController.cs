@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using game_store_be.Dtos;
 using game_store_be.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,7 @@ namespace game_store_be.Controllers
             return Ok(genreDto);
         }
 
+        [Authorize]
         [HttpPost("create")]
         public IActionResult CreateNewGenre([FromBody] Genre newGenre)
         {
@@ -58,6 +60,7 @@ namespace game_store_be.Controllers
             return Ok(genreDto);
         }
 
+        [Authorize]
         [HttpPut("update/{idGenre}")]
         public IActionResult UpdateGenreById(string idGenre, [FromBody] GenreDto newGenre)
         {
