@@ -30,7 +30,7 @@ namespace game_store_be.Controllers
             return Ok(imageDetails);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("create")]
         public IActionResult CreateImageDetail([FromBody] ImageGameDetail newImageDetail)
         {
@@ -43,6 +43,21 @@ namespace game_store_be.Controllers
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
+        }
+
+        [HttpDelete("delete")]
+        public IActionResult DeleteImageDetail ([FromBody] ImageGameDetail imageGameDetail )
+        {
+            var existImagGameDetail = _context.ImageGameDetail.FirstOrDefault(igd => igd.IdGame == imageGameDetail.IdGame && igd.IdImage == imageGameDetail.IdImage);
+            if (existImagGameDetail == null)
+            {
+                return NotFound(new { message = "Not found" });
+            }
+
+            _context.ImageGameDetail.Remove(existImagGameDetail);
+            _context.SaveChanges();
+
+            return Ok(new { message = "Delete Success" });
         }
     }
 }
