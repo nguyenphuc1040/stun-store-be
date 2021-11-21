@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace game_store_be.Controllers
 {
-    [Authorize(Roles = "admin")]
+    //[Authorize(Roles = "admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase

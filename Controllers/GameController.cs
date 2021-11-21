@@ -61,7 +61,7 @@ namespace game_store_be.Controllers
             return Ok(existGameDto);
         }
 
-        [Authorize(Roles = "admin")]
+        //[Authorize(Roles = "admin")]
         [HttpPost("create")]
         public IActionResult CreateGame([FromBody] PostGameBody newGameBody)
         {
