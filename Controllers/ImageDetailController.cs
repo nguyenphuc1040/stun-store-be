@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using game_store_be.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -22,11 +23,6 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
 
-        private ImageGameDetail GetDiscountByIdService(string idImageDetail)
-        {
-            return _context.ImageGameDetail.FirstOrDefault(dc => dc.IdImage == idImageDetail);
-        }
-
         [HttpGet]
         public IActionResult GetAllImageDetail()
         {
@@ -34,6 +30,7 @@ namespace game_store_be.Controllers
             return Ok(imageDetails);
         }
 
+        [Authorize]
         [HttpPost("create")]
         public IActionResult CreateImageDetail([FromBody] ImageGameDetail newImageDetail)
         {

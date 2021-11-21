@@ -21,6 +21,7 @@ namespace game_store_be.Models
         public string NumberPhone { get; set; }
         public string Avatar { get; set; }
         public string Background { get; set; }
+        public string Roles { get; set; }
 
         public virtual ICollection<Bill> Bill { get; set; }
         public virtual ICollection<Collection> Collection { get; set; }

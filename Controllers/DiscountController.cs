@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using game_store_be.Dtos;
 using game_store_be.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -48,6 +49,7 @@ namespace game_store_be.Controllers
             return Ok(discountDto);
         }
 
+        [Authorize(Roles ="admin")]
         [HttpPost("create")]
         public IActionResult CreateDiscount([FromBody] Discount newDiscount)
         {
@@ -58,6 +60,7 @@ namespace game_store_be.Controllers
             return Ok(discountDto);
         }
 
+        [Authorize]
         [HttpPut("update/{idDiscount}")]
         public IActionResult UpdateDiscountById(string idDiscount,[FromBody] DiscountDto newDiscount )
         {

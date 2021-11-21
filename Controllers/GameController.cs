@@ -2,6 +2,7 @@
 using game_store_be.CustomModel;
 using game_store_be.Dtos;
 using game_store_be.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -59,6 +60,8 @@ namespace game_store_be.Controllers
 
             return Ok(existGameDto);
         }
+
+        [Authorize(Roles = "admin")]
         [HttpPost("create")]
         public IActionResult CreateGame([FromBody] PostGameBody newGameBody)
         {

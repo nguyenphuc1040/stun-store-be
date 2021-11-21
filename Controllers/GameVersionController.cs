@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using game_store_be.Dtos;
 using game_store_be.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,8 @@ namespace game_store_be.Controllers
             var gamesVersions = _context.GameVersion.ToList();
             return Ok(gamesVersions);
         }
+
+        [Authorize( Roles ="admin" ) ]
         [HttpPost("create")]
         public IActionResult CreateGameVersion([FromBody] GameVersion newGameVersion )
         {
@@ -38,6 +41,7 @@ namespace game_store_be.Controllers
             return Ok(newGameVersion);
         }
 
+        [Authorize(Roles = "admin") ]
         [HttpGet("by-game/{idGame}")]
         public IActionResult GetVersionByIdGame(string idGame)
         {
