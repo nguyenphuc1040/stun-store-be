@@ -10,5 +10,7 @@ namespace game_store_be.CustomModel
     {
         public Game Game { get; set; } 
         public GameVersion GameVersion { get; set; }
+
+        public List<string>? ListImageDetail { get; set; }
     }
 }

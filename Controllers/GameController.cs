@@ -2,6 +2,7 @@
 using game_store_be.CustomModel;
 using game_store_be.Dtos;
 using game_store_be.Models;
+using game_store_be.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -65,20 +66,36 @@ namespace game_store_be.Controllers
         [HttpPost("create")]
         public IActionResult CreateGame([FromBody] PostGameBody newGameBody)
         {
+            var mapper = new CustomMapper(_mapper);
             var newGame = newGameBody.Game;
             var newGameVersion = newGameBody.GameVersion;
+            var listImageDetail = newGameBody.ListImageDetail;
 
             var id = Guid.NewGuid().ToString();
             newGame.IdGame = id;
             newGameVersion.IdGame = id;
             newGameVersion.IdGameVersion = Guid.NewGuid().ToString();
 
+            var listImageGameDetail = new List<ImageGameDetail>();
+            if (listImageDetail != null )
+            {
+                foreach (var image in listImageDetail)
+                {
+                    var imageDetail = new ImageGameDetail() { IdGame = id, Url = image, IdImage = Guid.NewGuid().ToString() };
+                    listImageGameDetail.Add(imageDetail);
+                }
+            }
+
             _context.Game.Add(newGame);
             _context.GameVersion.Add(newGameVersion);
+            _context.ImageGameDetail.AddRange(listImageGameDetail);
+
             _context.SaveChanges();
 
+            var listImageGameDto = mapper.CustomMapListImageGameDetail (listImageGameDetail);
             var newGameDto = _mapper.Map<Game, GameDto>(newGame);
-            var newGameVersionDto = _mapper.Map<Game, GameDto>(newGame);
+            newGameDto.ImageGameDetail = listImageGameDto;
+            var newGameVersionDto = _mapper.Map<GameVersion, GameVersionDto>(newGameVersion);
 
             return Ok(new {newGameDto, newGameVersionDto });
         }

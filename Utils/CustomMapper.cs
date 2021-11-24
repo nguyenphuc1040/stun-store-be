@@ -90,5 +90,15 @@ namespace game_store_be.Utils
             }
             return listCollectionDto;
         }
+
+        public ICollection<ImageGameDetailDto> CustomMapListImageGameDetail (ICollection<ImageGameDetail> listImage)
+        {
+            var listImageDto = new List<ImageGameDetailDto>();
+            foreach (var image in listImage)
+            {
+                listImageDto.Add(_mapper.Map<ImageGameDetail, ImageGameDetailDto>(image));
+            }
+            return listImageDto;
+        }
     }
 }
