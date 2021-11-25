@@ -4,6 +4,7 @@ using game_store_be.Dtos;
 using game_store_be.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -12,6 +13,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +35,11 @@ namespace game_store_be.Controllers
             _config = configuration;
         }
 
+        private LoginRes CreateResLoginSuccess(Users infoUser)
+        {
+            string token = CreateJWT(infoUser);
+            return  new LoginRes() { Token = token, Username = infoUser.UserName};
+        }
         private string HassPassword(string password)
         {
             byte[] salt = new byte[128 / 8];
@@ -114,16 +121,30 @@ namespace game_store_be.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] Login infoLogin)
         {
-            var existUser = _context.Users.FirstOrDefault(u => u.Email == infoLogin.Email && u.Password == HassPassword(infoLogin.Password));
-            if (existUser == null)
+            string lastToken = HttpContext.Request.Headers["token"];
+            var loginRes = new LoginRes();
+            var findUser = new Users();
+
+            if (lastToken == null || lastToken == "")
             {
-                return NotFound(new { message = "Info login is incorrect" });
+                var existUser = _context.Users.FirstOrDefault(u => u.Email == infoLogin.Email && u.Password == HassPassword(infoLogin.Password));
+
+                if (existUser == null)
+                {
+                    return NotFound(new { message = "Info login is incorrect" });
+                }
+
+                return Ok(CreateResLoginSuccess(existUser));
             }
 
-            var loginRes = new LoginRes();
-            loginRes.Username = existUser.UserName;
-            loginRes.Token = CreateJWT(existUser);
-            return Ok(loginRes);
+            var handler = new JwtSecurityTokenHandler();
+            var jwtSecurityToken = handler.ReadJwtToken(lastToken);
+
+            var idUser = jwtSecurityToken.Claims.First(claim => claim.Type == "nameid").Value;
+
+            var user = ExistUser(idUser);
+            if (user == null) return Unauthorized(new { message = "Invalid token" });
+            return Ok(CreateResLoginSuccess(user));
         }
 
         [HttpPut("update/{idUser}")]
