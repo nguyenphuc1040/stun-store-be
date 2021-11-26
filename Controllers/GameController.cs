@@ -109,19 +109,17 @@ namespace game_store_be.Controllers
                     _context.DetailGenre,
                     game => game.IdGame,
                     detailGenre => detailGenre.IdGame,
-                    (game, detailGenre) => new { game = game.IdGame, detailGenre }
+                    (game, detailGenre) => new { detailGenre }
                 )
-                .AsNoTracking()
                 .Where(e => e.detailGenre.IdGame == idGame)
                 .Join(
-                    _context.Game,
-                    genre => genre.detailGenre.IdGame,
-                    game => game.IdGame,
-                    (genre, game) => new { game = game }
+                    _context.DetailGenre,
+                    genre => genre.detailGenre.IdGenre,
+                    genreFound => genreFound.IdGenre,
+                    (genre, genreFound) => new {  genreFound.IdGame }
                 )
+                .Where(e => e.IdGame != idGame)
                 .Take(amount);
-
-
 
             return Ok(gameMoreLikeThis);
         }
