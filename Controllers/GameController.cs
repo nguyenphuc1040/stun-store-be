@@ -121,9 +121,9 @@ namespace game_store_be.Controllers
                 )
                 .Take(amount);
 
-            var gameMoreLikeThisDto = _mapper.Map<Game, GameDto>(gameMoreLikeThis);
 
-            return Ok(gameMoreLikeThisDto);
+
+            return Ok(gameMoreLikeThis);
         }
     }
 }
