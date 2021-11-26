@@ -99,5 +99,31 @@ namespace game_store_be.Controllers
 
             return Ok(new {newGameDto, newGameVersionDto });
         }
+
+        [HttpGet("more-like-this/{idGame}/{amount}")]
+        public IActionResult GetGameMoreLikeThis(string idGame, int amount)
+        {
+
+            var gameMoreLikeThis = _context.Game
+                .Join(
+                    _context.DetailGenre,
+                    game => game.IdGame,
+                    detailGenre => detailGenre.IdGame,
+                    (game, detailGenre) => new { game = game.IdGame, detailGenre }
+                )
+                .AsNoTracking()
+                .Where(e => e.detailGenre.IdGame == idGame)
+                .Join(
+                    _context.Game,
+                    genre => genre.detailGenre.IdGame,
+                    game => game.IdGame,
+                    (genre, game) => new { game = game }
+                )
+                .Take(amount);
+
+            var gameMoreLikeThisDto = _mapper.Map<Game, GameDto>(gameMoreLikeThis);
+
+            return Ok(gameMoreLikeThisDto);
+        }
     }
 }

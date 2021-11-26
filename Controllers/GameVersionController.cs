@@ -64,10 +64,41 @@ namespace game_store_be.Controllers
             var existGameDto = _mapper.Map<Game, GameDto>(existGame);
             var imageDto = _mapper.Map<ICollection < ImageGameDetailDto>>(imageDetail);
             existGameDto.ImageGameDetail = imageDto;
+            existGameversionDto.UrlDowload = null;
             existGameDto.NewVersion = existGameversionDto;
 
             return Ok(existGameDto); 
         }
+        [HttpGet("by-game/{idGame}/{lastestVersion}")]
+        public IActionResult GetNewVersionByIdGameAndLastestVersion(string idGame, string lastestVersion)
+        {
+            var existGameVersion = _context.GameVersion
+                .Where(gv => gv.IdGame == idGame && gv.VersionGame == lastestVersion)
+                .FirstOrDefault();
+
+            var existGame = _context.Game.First(g => g.IdGame == idGame);
+            var imageDetail = _context.ImageGameDetail.Where(i => i.IdGame == idGame);
+
+            var existGameversionDto = _mapper.Map<GameVersion, GameVersionDto>(existGameVersion);
+            var existGameDto = _mapper.Map<Game, GameDto>(existGame);
+            var imageDto = _mapper.Map<ICollection<ImageGameDetailDto>>(imageDetail);
+            existGameDto.ImageGameDetail = imageDto;
+            existGameversionDto.UrlDowload = null;
+            existGameDto.NewVersion = existGameversionDto;
+
+            return Ok(existGameDto);
+        }
+        [Authorize]
+        [HttpGet("by-game/url-download")]
+        public IActionResult GetUrlDownloadByIdGameVersion()
+        {
+            string gameVer = HttpContext.Request.Headers["idGameVersion"];
+            var urlDownload = _context.GameVersion
+                .First(gv => gv.IdGameVersion == gameVer).UrlDowload;
+          
+            return Ok(urlDownload);
+        }
+
 
     }
 }
