@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using game_store_be.Utils;
 
 namespace game_store_be.Controllers
 {
@@ -25,15 +26,15 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
         [HttpGet]
-        public IActionResult GetAllGameVersion ()
+        public IActionResult GetAllGameVersion()
         {
             var gamesVersions = _context.GameVersion.ToList();
             return Ok(gamesVersions);
         }
 
-        [Authorize( Roles ="admin" ) ]
+        [Authorize(Roles = "admin")]
         [HttpPost("create")]
-        public IActionResult CreateGameVersion([FromBody] GameVersion newGameVersion )
+        public IActionResult CreateGameVersion([FromBody] GameVersion newGameVersion)
         {
             newGameVersion.IdGameVersion = Guid.NewGuid().ToString();
             _context.GameVersion.Add(newGameVersion);
@@ -41,7 +42,7 @@ namespace game_store_be.Controllers
             return Ok(newGameVersion);
         }
 
-        [Authorize(Roles = "admin") ]
+        [Authorize(Roles = "admin")]
         [HttpGet("by-game/{idGame}")]
         public IActionResult GetVersionByIdGame(string idGame)
         {
@@ -55,6 +56,7 @@ namespace game_store_be.Controllers
         {
             var existGameVersion = _context.GameVersion
                 .Where(g => g.IdGameNavigation.IdGame == idGame)
+                .Include(g => g.IdGameNavigation)
                 .OrderByDescending(gv => gv.VersionGame)
                 .ToList().ElementAt(0);
             var existGame = _context.Game.First(g => g.IdGame == idGame);
@@ -62,25 +64,26 @@ namespace game_store_be.Controllers
 
             var existGameversionDto = _mapper.Map<GameVersion, GameVersionDto>(existGameVersion);
             var existGameDto = _mapper.Map<Game, GameDto>(existGame);
-            var imageDto = _mapper.Map<ICollection < ImageGameDetailDto>>(imageDetail);
+            var imageDto = _mapper.Map<ICollection<ImageGameDetailDto>>(imageDetail);
             existGameDto.ImageGameDetail = imageDto;
             existGameversionDto.UrlDowload = null;
             existGameDto.NewVersion = existGameversionDto;
 
-            return Ok(existGameDto); 
+            return Ok(existGameDto);
         }
         [HttpGet("by-game/{idGame}/{lastestVersion}")]
         public IActionResult GetNewVersionByIdGameAndLastestVersion(string idGame, string lastestVersion)
         {
+            var customMapper = new CustomMapper(_mapper);
             var existGameVersion = _context.GameVersion
                 .Where(gv => gv.IdGame == idGame && gv.VersionGame == lastestVersion)
                 .FirstOrDefault();
 
-            var existGame = _context.Game.First(g => g.IdGame == idGame);
+            var existGame = _context.Game.Include(g => g.IdDiscountNavigation).First(g => g.IdGame == idGame);
             var imageDetail = _context.ImageGameDetail.Where(i => i.IdGame == idGame);
 
+            var existGameDto = customMapper.CustomMapGame(existGame);
             var existGameversionDto = _mapper.Map<GameVersion, GameVersionDto>(existGameVersion);
-            var existGameDto = _mapper.Map<Game, GameDto>(existGame);
             var imageDto = _mapper.Map<ICollection<ImageGameDetailDto>>(imageDetail);
             existGameDto.ImageGameDetail = imageDto;
             existGameversionDto.UrlDowload = null;
@@ -95,7 +98,7 @@ namespace game_store_be.Controllers
             string gameVer = HttpContext.Request.Headers["idGameVersion"];
             var urlDownload = _context.GameVersion
                 .First(gv => gv.IdGameVersion == gameVer).UrlDowload;
-          
+
             return Ok(urlDownload);
         }
 

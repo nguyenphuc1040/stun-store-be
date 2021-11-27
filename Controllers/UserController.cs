@@ -38,7 +38,7 @@ namespace game_store_be.Controllers
         private LoginRes CreateResLoginSuccess(Users infoUser)
         {
             string token = CreateJWT(infoUser);
-            return  new LoginRes() { Token = token, Username = infoUser.UserName};
+            return new LoginRes() { Token = token, Username = infoUser.UserName };
         }
         private string HassPassword(string password)
         {
@@ -52,7 +52,8 @@ namespace game_store_be.Controllers
             return hashed;
         }
 
-        private string CreateJWT(Users user) {
+        private string CreateJWT(Users user)
+        {
 
             var secretKey = _config.GetSection("AppSettings:Key").Value;
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
@@ -148,12 +149,12 @@ namespace game_store_be.Controllers
         }
 
         [HttpPut("update/{idUser}")]
-        public IActionResult UpdateUser (string idUser, [FromBody] UserDto newUser)
+        public IActionResult UpdateUser(string idUser, [FromBody] UserDto newUser)
         {
             var existUser = ExistUser(idUser);
             if (existUser == null)
             {
-                return NotFound(new { message ="Not found"});
+                return NotFound(new { message = "Not found" });
             }
             newUser.IdUser = existUser.IdUser;
             _mapper.Map(newUser, existUser);
