@@ -327,6 +327,11 @@ namespace game_store_be.Models
                     .HasMaxLength(200)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Memory)
+                    .HasColumnName("memory")
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.IdGame)
                     .HasColumnName("idGame")
                     .HasMaxLength(50)
