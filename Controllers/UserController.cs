@@ -38,7 +38,9 @@ namespace game_store_be.Controllers
         private LoginRes CreateResLoginSuccess(Users infoUser)
         {
             string token = CreateJWT(infoUser);
-            return new LoginRes() { Token = token, Username = infoUser.UserName };
+            var userDto = _mapper.Map<Users, UserDto>(infoUser);
+
+            return new LoginRes() { Token = token, User = userDto };
         }
         private string HassPassword(string password)
         {

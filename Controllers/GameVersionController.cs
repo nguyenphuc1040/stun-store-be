@@ -79,7 +79,11 @@ namespace game_store_be.Controllers
                 .Where(gv => gv.IdGame == idGame && gv.VersionGame == lastestVersion)
                 .FirstOrDefault();
 
-            var existGame = _context.Game.Include(g => g.IdDiscountNavigation).First(g => g.IdGame == idGame);
+            var existGame = _context.Game
+                .Include(g => g.IdDiscountNavigation)
+                .Include(g => g.DetailGenre)
+                    .ThenInclude(g => g.IdGenreNavigation)
+                .First(g => g.IdGame == idGame);
             var imageDetail = _context.ImageGameDetail.Where(i => i.IdGame == idGame);
 
             var existGameDto = customMapper.CustomMapGame(existGame);
