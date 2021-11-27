@@ -75,15 +75,19 @@ namespace game_store_be.Controllers
         public IActionResult GetNewVersionByIdGameAndLastestVersion(string idGame, string lastestVersion)
         {
             var customMapper = new CustomMapper(_mapper);
-            var existGameVersion = _context.GameVersion
-                .Where(gv => gv.IdGame == idGame && gv.VersionGame == lastestVersion)
-                .FirstOrDefault();
 
             var existGame = _context.Game
-                .Include(g => g.IdDiscountNavigation)
-                .Include(g => g.DetailGenre)
-                    .ThenInclude(g => g.IdGenreNavigation)
-                .First(g => g.IdGame == idGame);
+                            .Include(g => g.IdDiscountNavigation)
+                            .Include(g => g.DetailGenre)
+                                .ThenInclude(g => g.IdGenreNavigation)
+                            .FirstOrDefault(g => g.IdGame == idGame);
+            if (existGame == null) return NotFound(new { message = "Game not found" });
+
+            var existGameVersion = _context.GameVersion
+                .FirstOrDefault(gv => gv.IdGame == idGame && gv.VersionGame == lastestVersion);
+            if (existGameVersion == null) return NotFound(new { message = "Version not found" });
+
+
             var imageDetail = _context.ImageGameDetail.Where(i => i.IdGame == idGame);
 
             var existGameDto = customMapper.CustomMapGame(existGame);
