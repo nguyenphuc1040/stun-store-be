@@ -50,6 +50,15 @@ namespace game_store_be.Controllers
             return Ok(existGameDto);
         }
 
+        
+        /**
+        * API GET new-version of Game by idGame
+        * @param {String} idGame
+        * @return {JSON) 
+        * status: 200 : ok
+        * status: 404 : notfound
+        */
+
         [HttpGet("by-game/new-version/{idGame}")]
         public IActionResult GetNewVersionByIdGame(string idGame)
         {

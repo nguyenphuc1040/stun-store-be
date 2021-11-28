@@ -29,6 +29,15 @@ namespace game_store_be.Controllers
         {
             return _context.SlideGameHot.FirstOrDefault(dc => dc.IdGame == idGame);
         }
+        
+        [Authorize(Roles = "admin")]
+        [HttpPost("create")]
+        public IActionResult CreateSlideGameHot([FromBody] SlideGameHot newSlide)
+        {
+            _context.SlideGameHot.Add(newSlide);
+            _context.SaveChanges();
+            return Ok(newSlide);
+        }
 
         [HttpGet]
         public IActionResult GetAllSlideGameHot()
@@ -38,13 +47,6 @@ namespace game_store_be.Controllers
             return Ok(slideGameHotDtos);
         }
 
-        [Authorize(Roles = "admin")]
-        [HttpPost("create")]
-        public IActionResult CreateSlideGameHot([FromBody] SlideGameHot newSlide)
-        {
-            _context.SlideGameHot.Add(newSlide);
-            _context.SaveChanges();
-            return Ok(newSlide);
-        }
+        
     }
 }
