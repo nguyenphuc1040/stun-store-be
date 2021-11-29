@@ -27,6 +27,7 @@ namespace game_store_be.Models
         public virtual DbSet<SlideGameHot> SlideGameHot { get; set; }
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<WishList> WishList { get; set; }
+        public virtual DbSet<Suggestion> Suggestion { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -39,6 +40,27 @@ namespace game_store_be.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Suggestion>(entity =>
+            {
+                entity.HasKey(e => e.IdSuggestion).HasName("pk_Suggestion");
+
+                entity.Property(e => e.IdSuggestion)
+                    .HasColumnName("idSuggestion")
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnType("varchar(50) unsigned");
+
+                entity.Property(e => e.Title)
+                    .HasColumnName("title")
+                    .IsUnicode(false)
+                    .HasColumnType("varchar(50) unsigned");
+
+                entity.Property(e => e.Value)
+                    .HasColumnName("value")
+                    .IsUnicode(false)
+                    .HasColumnType("varchar unsigned");
+
+            });
             modelBuilder.Entity<Bill>(entity =>
             {
                 entity.HasKey(e => e.IdBill)
