@@ -21,11 +21,8 @@ namespace game_store_be.Utils
             CreateMap<Bill, BillDto>().ReverseMap();
             CreateMap<Discount, DiscountDto>().ReverseMap();
             CreateMap<Collection, CollectionDto>().ReverseMap();
-<<<<<<< HEAD
             CreateMap<Discount, Discount>().ReverseMap();
-=======
             CreateMap<Comments, CommentsDto>().ReverseMap();
->>>>>>> 0e75a4e40d55527ab02cfd1e9c096b50d0b932b1
         }
     }
 }
