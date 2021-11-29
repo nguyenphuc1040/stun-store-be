@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace game_store_be.Controllers
 {
-    [Authorize(Roles = "admin")]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -94,7 +94,7 @@ namespace game_store_be.Controllers
             var userDto = _mapper.Map<IEnumerable<UserDto>>(users);
             return Ok(userDto);
         }
-
+        
         [HttpGet("{idUser}")]
         public IActionResult GetUserById(string idUser)
         {
