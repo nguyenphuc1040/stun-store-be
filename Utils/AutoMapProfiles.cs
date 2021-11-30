@@ -19,8 +19,10 @@ namespace game_store_be.Utils
             CreateMap<GameVersion, GameVersionDto>().ReverseMap();
             CreateMap<WishList, WishListDto>().ReverseMap();
             CreateMap<Bill, BillDto>().ReverseMap();
-            CreateMap<Discount, BillDiscount>().ReverseMap();
+            CreateMap<Discount, DiscountDto>().ReverseMap();
             CreateMap<Collection, CollectionDto>().ReverseMap();
+            CreateMap<Discount, Discount>().ReverseMap();
+            CreateMap<Comments, CommentsDto>().ReverseMap();
         }
     }
 }

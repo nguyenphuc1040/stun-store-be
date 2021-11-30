@@ -9,7 +9,6 @@ namespace game_store_be.Dtos
     {
         public string IdUser { get; set; }
         public string UserName { get; set; }
-        public string Password { get; set; }
         public string RealName { get; set; }
         public string Email { get; set; }
         public string NumberPhone { get; set; }
