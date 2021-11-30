@@ -5,6 +5,13 @@ namespace game_store_be.Models
 {
     public partial class Comments
     {
+
+        public Comments()
+        {
+            LikeComment = new HashSet<LikeComment>();
+            DisLikeComment = new HashSet<DisLikeComment>();
+        }
+
         public string IdComment { get; set; }
         public string IdGame { get; set; }
         public string IdUser { get; set; }
@@ -18,5 +25,10 @@ namespace game_store_be.Models
 
         public virtual Game IdGameNavigation { get; set; }
         public virtual Users IdUserNavigation { get; set; }
+
+        public virtual ICollection<LikeComment> LikeComment { get; set; }
+        public virtual ICollection<DisLikeComment> DisLikeComment { get; set; }
+
+
     }
 }

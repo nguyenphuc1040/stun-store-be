@@ -11,6 +11,8 @@ namespace game_store_be.Models
             Collection = new HashSet<Collection>();
             Comments = new HashSet<Comments>();
             WishList = new HashSet<WishList>();
+            LikeComment = new HashSet<LikeComment>();
+            DisLikeComment = new HashSet<DisLikeComment>();
         }
 
         public string IdUser { get; set; }
@@ -27,5 +29,7 @@ namespace game_store_be.Models
         public virtual ICollection<Collection> Collection { get; set; }
         public virtual ICollection<Comments> Comments { get; set; }
         public virtual ICollection<WishList> WishList { get; set; }
+        public virtual ICollection<LikeComment> LikeComment { get; set; }
+        public virtual ICollection<DisLikeComment> DisLikeComment { get; set; }
     }
 }
