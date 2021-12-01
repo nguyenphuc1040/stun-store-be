@@ -8,5 +8,6 @@ namespace game_store_be.Models
         public string IdSuggestion { get; set; }
         public string Title { get; set; }
         public string Value { get; set; }
+        public int Position { get; set; }
     }
 }

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace game_store_be.Controllers
 {
+    [Authorize(Roles = "admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class SuggestionController : ControllerBase
@@ -36,6 +37,23 @@ namespace game_store_be.Controllers
             _context.Suggestion.Add(newSuggestion);
             _context.SaveChanges();
             return Ok(newSuggestion);
+        }
+
+        [HttpPut("update")]
+        public IActionResult UpdateSuggestion([FromBody] Suggestion updateSuggestion)
+        {
+            var existSuggestion = _context.Suggestion
+                .FirstOrDefault(sg => sg.IdSuggestion == updateSuggestion.IdSuggestion);
+            if (existSuggestion == null)
+            {
+                return NotFound(new { message = "Suggestion Not Found"});
+            }
+            existSuggestion.Value = updateSuggestion.Value;
+            existSuggestion.Position = updateSuggestion.Position;
+
+            _mapper.Map(updateSuggestion, existSuggestion);
+            _context.SaveChanges();
+            return Ok(existSuggestion);
         }
     }
 }

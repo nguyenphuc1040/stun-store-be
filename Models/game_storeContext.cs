@@ -28,6 +28,7 @@ namespace game_store_be.Models
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<WishList> WishList { get; set; }
         public virtual DbSet<Suggestion> Suggestion { get; set; }
+        public virtual DbSet<LikeComment> LikeComment {get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -573,6 +574,10 @@ namespace game_store_be.Models
                     .HasConstraintName("fk_WishList_Users");
             });
 
+            modelBuilder.Entity<LikeComment>(entity =>
+            {
+                entity.HasKey(e => new {e.IdComment, e.IdUser});
+            });
             OnModelCreatingPartial(modelBuilder);
         }
 
