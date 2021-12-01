@@ -52,12 +52,11 @@ namespace game_store_be.Hubs
                 newCmt.Time = DateTime.UtcNow;
                 _context.Comments.Add(newCmt);
                 _context.SaveChanges();
-              /*  var commentsDto = _mapper.Map<Comments, CommentsDto>(newCmt);*/
                 await Clients.Group(userConnection.Room)
                     .SendAsync("ReceiveCreateComment", userConnection.User, newCmt);
             }
         }
-        public async Task UpdateComment(Comments updateCmt, string action)
+        public async Task UpdateComment(Comments updateCmt,string idUserLike, string action)
         {
             if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
@@ -66,13 +65,13 @@ namespace game_store_be.Hubs
                 if (existCmt != null)
                 {
                     var existLikeComment = _context.LikeComment
-                        .FirstOrDefault(e => e.IdComment == updateCmt.IdComment && e.IdUser == updateCmt.IdUser);
+                        .FirstOrDefault(e => e.IdComment == updateCmt.IdComment && e.IdUser == idUserLike);
                     switch (action){
                         case "like":
                             if (existLikeComment == null){
                                 updateCmt.Likes ++;
                                 LikeComment newLikeCmt = new LikeComment(
-                                    updateCmt.IdComment, updateCmt.IdUser, true
+                                    updateCmt.IdComment, idUserLike, true
                                 );
                                 _context.LikeComment.Add(newLikeCmt);
                                 _context.SaveChanges();
@@ -94,11 +93,11 @@ namespace game_store_be.Hubs
                             if (existLikeComment == null){
                                 updateCmt.Dislike ++;
                                 LikeComment newLikeCmt = new LikeComment(
-                                    updateCmt.IdComment, updateCmt.IdUser, false
+                                    updateCmt.IdComment, idUserLike, false
                                 );
                                 _context.LikeComment.Add(newLikeCmt);
                                 _context.SaveChanges();
-                            }
+                            } else
                             if (!existLikeComment.IsLike){
                                 updateCmt.Dislike --;
                                 _context.LikeComment.Remove(existLikeComment);
