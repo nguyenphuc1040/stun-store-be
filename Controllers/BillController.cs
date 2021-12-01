@@ -33,7 +33,7 @@ namespace game_store_be.Controllers
             _config = config;
         }
 
-        private ICollection<Bill> ExistBills (string idUser, string idGame)
+        private ICollection<Bill> ExistBills(string idUser, string idGame)
         {
             return (_context.Bill.Where(b => b.IdUser == idUser && b.IdGame == idGame).ToList());
         }
@@ -143,11 +143,11 @@ namespace game_store_be.Controllers
                 }
                 return Ok(new { message = contentString });
             }
-            catch 
+            catch
             {
-                return BadRequest( new { message = "Game already payed" }) ;
+                return BadRequest(new { message = "Game already payed" });
             }
-           
+
         }
     }
 }

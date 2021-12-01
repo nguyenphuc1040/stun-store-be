@@ -41,6 +41,9 @@ namespace game_store_be.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+
+
             modelBuilder.Entity<Suggestion>(entity =>
             {
                 entity.HasKey(e => e.IdSuggestion).HasName("pk_Suggestion");
@@ -576,8 +579,64 @@ namespace game_store_be.Models
 
             modelBuilder.Entity<LikeComment>(entity =>
             {
-                entity.HasKey(e => new {e.IdComment, e.IdUser});
+                entity.HasKey(e => new { e.IdComment, e.IdUser })
+                    .HasName("pk_LikeComment");
+
+                entity.Property(e => e.IdComment)
+                    .HasColumnName("idcomment")
+                    .IsUnicode(false)
+                    .HasColumnType("varchar unsigned");
+
+                entity.Property(e => e.IdUser)
+                    .HasColumnName("idUser")
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnType("varchar(50) unsigned");
+
+
+                entity.HasOne(d => d.IdCommentNavigation)
+                    .WithMany(p => p.LikeComment)
+                    .HasForeignKey(d => d.IdComment)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("fk_LikeComment_Comment");
+
+                entity.HasOne(d => d.IdUserNavigation)
+                    .WithMany(p => p.LikeComment)
+                    .HasForeignKey(d => d.IdUser)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("fk_DetailGenre_Genre");
             });
+
+            modelBuilder.Entity<DisLikeComment>(entity =>
+            {
+                entity.HasKey(e => new { e.IdComment, e.IdUser })
+                    .HasName("pk_DisLikeComment");
+
+                entity.Property(e => e.IdComment)
+                    .HasColumnName("idcomment")
+                    .IsUnicode(false)
+                    .HasColumnType("varchar unsigned");
+
+                entity.Property(e => e.IdUser)
+                    .HasColumnName("idUser")
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnType("varchar(50) unsigned");
+
+
+                entity.HasOne(d => d.IdCommentNavigation)
+                    .WithMany(p => p.DisLikeComment)
+                    .HasForeignKey(d => d.IdComment)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("fk_DisLikeComment_Comment");
+
+                entity.HasOne(d => d.IdUserNavigation)
+                    .WithMany(p => p.DisLikeComment)
+                    .HasForeignKey(d => d.IdUser)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("fk_DetailGenre_Genre");
+            });
+
             OnModelCreatingPartial(modelBuilder);
         }
 
