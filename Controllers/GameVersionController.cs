@@ -104,12 +104,20 @@ namespace game_store_be.Controllers
         public IActionResult GetUrlDownloadByIdGameVersion()
         {
             string gameVer = HttpContext.Request.Headers["idGameVersion"];
-            var urlDownload = _context.GameVersion
-                .First(gv => gv.IdGameVersion == gameVer).UrlDowload;
+            var gameVersionExist = _context.GameVersion
+                .FirstOrDefault(gv => gv.IdGameVersion == gameVer);
+            if (gameVersionExist != null)
+            {
+                var gameExist = _context.Game.FirstOrDefault(g => g.IdGame == gameVersionExist.IdGame);
+                if (gameExist != null)
+                {
+                    gameExist.NumberOfDownloaders += 1;
+                    _context.SaveChanges();
+                }
+                return Ok(gameVersionExist.UrlDowload);
+            }
 
-            return Ok(urlDownload);
+            return NotFound(new { message = "Not found game version" });
         }
-
-
     }
 }
