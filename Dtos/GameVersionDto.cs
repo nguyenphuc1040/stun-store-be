@@ -21,5 +21,6 @@ namespace game_store_be.Dtos
         public string DirectX { get; set; }
         public string Graphics { get; set; }
         public string PrivacyPolicy { get; set; }
+        public string FilePlay { get; set; }
     }
 }

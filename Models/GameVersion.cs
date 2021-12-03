@@ -20,7 +20,7 @@ namespace game_store_be.Models
         public string DirectX { get; set; }
         public string Graphics { get; set; }
         public string PrivacyPolicy { get; set; }
-
+        public string FilePlay { get; set; }
         public virtual Game IdGameNavigation { get; set; }
     }
 }

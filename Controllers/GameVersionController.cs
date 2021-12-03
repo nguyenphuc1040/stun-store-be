@@ -88,7 +88,9 @@ namespace game_store_be.Controllers
             if (existGameVersion == null) return NotFound(new { message = "Version not found" });
 
 
-            var imageDetail = _context.ImageGameDetail.Where(i => i.IdGame == idGame);
+            var imageDetail = _context.ImageGameDetail
+                                .Where(i => i.IdGame == idGame)
+                                .OrderBy(i => i.Url);
 
             var existGameDto = customMapper.CustomMapGame(existGame);
             var existGameversionDto = _mapper.Map<GameVersion, GameVersionDto>(existGameVersion);
