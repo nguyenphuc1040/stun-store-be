@@ -135,17 +135,27 @@ namespace game_store_be.Controllers
                 var contentString = res.Content.ReadAsStringAsync().Result;
                 if (contentString == "\"accept\"")
                 {
+                    billBody.NewBill.DatePay = DateTime.UtcNow;
                     _context.Bill.Add(billBody.NewBill);
                     _context.SaveChanges();
                     var billDto = customMapper.CustomMapBill(billBody.NewBill);
                     return Ok(billDto);
 
                 }
+                if (contentString == "\"Information does not match\"")
+                {
+
+                    return NotFound(new { message = contentString });
+                }
+
                 return Ok(new { message = contentString });
             }
-            catch
+            catch (Exception error)
             {
-                return BadRequest(new { message = "Game already payed" });
+                var message = error.Message;
+                if (message == "An error occurred while updating the entries. See the inner exception for details.") return BadRequest(new { message = "Game already payed" });
+                if (message == "Object reference not set to an instance of an object.") return BadRequest(new { message = "Body is incorrect." });
+                return BadRequest(new { message = message, clientMessage = "Have some error. Please try again." });
             }
 
         }
