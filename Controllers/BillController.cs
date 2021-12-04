@@ -42,6 +42,9 @@ namespace game_store_be.Controllers
         [HttpGet]
         public IActionResult GetAllBill()
         {
+            var billss = _context.Bill.ToList();
+            return Ok(billss);
+
             var customMapper = new CustomMapper(_mapper);
             var bills = _context.Bill
                 .Include(b => b.IdGameNavigation)
@@ -105,6 +108,15 @@ namespace game_store_be.Controllers
                 if (billBody.NewBill.Actions != "refund")
                 {
                     billBody.NewBill.Actions = "pay";
+                }
+                //  Case game free
+                if (billBody.NewBill.Cost <= 0)
+                {
+                    billBody.NewBill.DatePay = DateTime.UtcNow;
+                    _context.Bill.Add(billBody.NewBill);
+                    _context.SaveChanges();
+                    var billDto = customMapper.CustomMapBill(billBody.NewBill);
+                    return Ok(billDto);
                 }
 
                 //Call api check money

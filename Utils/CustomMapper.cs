@@ -29,16 +29,16 @@ namespace game_store_be.Utils
             }
             return gamesDto;
         }
-        public GameDto CustomMapGame (Game game)
+        public GameDto CustomMapGame(Game game)
         {
-            var gameDto = _mapper.Map<Game,GameDto>(game);
+            var gameDto = _mapper.Map<Game, GameDto>(game);
             gameDto.Discount = _mapper.Map<Discount, DiscountDto>(game.IdDiscountNavigation);
             gameDto.Genres = _mapper.Map<ICollection<DetailGenreDto>>(game.DetailGenre);
 
             return gameDto;
         }
 
-        public ICollection<WishListDto> CustomMapWishList (ICollection<WishList> wishList)
+        public ICollection<WishListDto> CustomMapWishList(ICollection<WishList> wishList)
         {
             var wishListDto = _mapper.Map<ICollection<WishListDto>>(wishList);
 
@@ -49,7 +49,7 @@ namespace game_store_be.Utils
             return wishListDto;
         }
 
-        public BillDto CustomMapBill (Bill bill)
+        public BillDto CustomMapBill(Bill bill)
         {
             var gameDto = _mapper.Map<Game, GameDto>(bill.IdGameNavigation);
             var userDto = _mapper.Map<Users, UserDto>(bill.IdUserNavigation);
@@ -62,7 +62,7 @@ namespace game_store_be.Utils
             }
             return billDto;
         }
-        public ICollection<BillDto> CustomMapListBill (ICollection<Bill> bills)
+        public ICollection<BillDto> CustomMapListBill(ICollection<Bill> bills)
         {
             var wishListDto = new List<BillDto>();
             for (var i = 0; i < bills.Count(); i++)
@@ -72,7 +72,7 @@ namespace game_store_be.Utils
             }
             return wishListDto;
         }
-        public CollectionDto CustomMapCollection (Collection collection)
+        public CollectionDto CustomMapCollection(Collection collection)
         {
             var gameDto = CustomMapGame(collection.IdGameNavigation);
             var collectionDto = _mapper.Map<Collection, CollectionDto>(collection);
@@ -80,7 +80,7 @@ namespace game_store_be.Utils
             return collectionDto;
         }
 
-        public ICollection <CollectionDto> CustomMapListCollection (ICollection<Collection> listCollection)
+        public ICollection<CollectionDto> CustomMapListCollection(ICollection<Collection> listCollection)
         {
             var listCollectionDto = new List<CollectionDto>();
             for (var i = 0; i < listCollection.Count(); i++)
@@ -91,7 +91,7 @@ namespace game_store_be.Utils
             return listCollectionDto;
         }
 
-        public ICollection<ImageGameDetailDto> CustomMapListImageGameDetail (ICollection<ImageGameDetail> listImage)
+        public ICollection<ImageGameDetailDto> CustomMapListImageGameDetail(ICollection<ImageGameDetail> listImage)
         {
             var listImageDto = new List<ImageGameDetailDto>();
             foreach (var image in listImage)
@@ -99,6 +99,17 @@ namespace game_store_be.Utils
                 listImageDto.Add(_mapper.Map<ImageGameDetail, ImageGameDetailDto>(image));
             }
             return listImageDto;
+        }
+
+        public List<DetailGenreDto> CustomMappDetailGenre(List<DetailGenre> listGenre)
+        {
+            var listGenreDto = new List<DetailGenreDto>();
+
+            foreach (var genre in listGenre)
+            {
+                listGenreDto.Add(_mapper.Map<DetailGenre, DetailGenreDto>(genre));
+            }
+            return listGenreDto;
         }
     }
 }
