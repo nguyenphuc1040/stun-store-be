@@ -110,12 +110,6 @@ namespace game_store_be.Controllers
                 .FirstOrDefault(gv => gv.IdGameVersion == gameVer);
             if (gameVersionExist != null)
             {
-                var gameExist = _context.Game.FirstOrDefault(g => g.IdGame == gameVersionExist.IdGame);
-                if (gameExist != null)
-                {
-                    gameExist.NumberOfDownloaders += 1;
-                    _context.SaveChanges();
-                }
                 return Ok(gameVersionExist.UrlDowload);
             }
 

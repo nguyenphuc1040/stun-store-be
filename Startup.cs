@@ -82,7 +82,6 @@ namespace game_store_be
             app.UseAuthentication();
             app.UseAuthorization();
 
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

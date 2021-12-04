@@ -221,5 +221,21 @@ namespace game_store_be.Controllers
 
             return Ok(gameMoreLikeThis);
         }
+        [Authorize]
+        [HttpGet("installed")]
+        public IActionResult UpdateDownloadedOfGame(){
+
+            string gameId = HttpContext.Request.Headers["idGame"];
+
+            var gameExist = _context.Game.FirstOrDefault(g => g.IdGame == gameId);
+            if (gameExist != null)
+            {
+                gameExist.NumberOfDownloaders += 1;
+                _context.SaveChanges();
+                return Ok(gameExist.NumberOfDownloaders);
+            }
+
+            return NotFound();
+        }
     }
 }
