@@ -22,6 +22,7 @@ namespace game_store_be.Utils
             CreateMap<Discount, DiscountDto>().ReverseMap();
             CreateMap<Collection, CollectionDto>().ReverseMap();
             CreateMap<Discount, Discount>().ReverseMap();
+            CreateMap<Game, Game>().ReverseMap();
             CreateMap<Comments, CommentsDto>().ReverseMap();
         }
     }
