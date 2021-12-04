@@ -41,7 +41,7 @@ namespace game_store_be.Controllers
             {
                 gamesDto.ToList().ElementAt(i).Discount = _mapper.Map<Discount, DiscountDto>(games.ToList().ElementAt(i).IdDiscountNavigation);
                 gamesDto.ToList().ElementAt(i).Genres = _mapper.Map<ICollection<DetailGenreDto>>(games.ToList().ElementAt(i).DetailGenre);
-                gamesDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(games.ToList().ElementAt(i).ImageGameDetail);
+                gamesDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(games.ToList().ElementAt(i).ImageGameDetail.OrderBy(i => i.Url));
             }
             return Ok(gamesDto);
         }
@@ -76,6 +76,8 @@ namespace game_store_be.Controllers
             newGame.IdGame = id;
             newGameVersion.IdGame = id;
             newGameVersion.IdGameVersion = Guid.NewGuid().ToString();
+            newGameVersion.DateUpdate = DateTime.UtcNow;
+            newGame.ReleaseDate = DateTime.UtcNow;
 
             var listImageGameDetail = new List<ImageGameDetail>();
             if (listImageDetail != null)
@@ -130,6 +132,72 @@ namespace game_store_be.Controllers
             return Ok(new { newGameDto, newGameVersionDto });
         }
 
+        [HttpPut("update/{idGame}")]
+        public IActionResult UpdateGame(string idGame, [FromBody] PostGameBody newGameBody)
+        {
+            var customMapper = new CustomMapper(_mapper);
+            var newGame = newGameBody.Game;
+            var newVersionGame = newGameBody.GameVersion;
+            var listImageDetail = newGameBody.ListImageDetail;
+            var listGenreDetail = newGameBody.ListGenreDetail;
+
+            var id = Guid.NewGuid().ToString();
+            newGame.IdGame = idGame;
+            newVersionGame.IdGameVersion = id;
+            newVersionGame.IdGame = idGame;
+            newVersionGame.DateUpdate = DateTime.UtcNow;
+
+            var existGame = GetGameByIdService(idGame);
+
+            if (existGame == null) return NotFound(new { message = "Game not found" });
+            _mapper.Map(newGame, existGame);
+
+            // remove old images
+            var existImageDetails = _context.ImageGameDetail.Where(imgD => imgD.IdGame == idGame);
+            _context.ImageGameDetail.RemoveRange(existImageDetails);
+
+            // add new images
+            var listImageDetailResult = new List<ImageGameDetail>();
+            if (listImageDetail.Count > 0)
+            {
+                foreach (var imageDetail in listImageDetail)
+                {
+                    var newImageDetail = new ImageGameDetail() { IdImage = Guid.NewGuid().ToString(), IdGame = idGame, Url = imageDetail };
+                    listImageDetailResult.Add(newImageDetail);
+                }
+                _context.ImageGameDetail.AddRange(listImageDetailResult);
+            }
+
+            // remove old genreDetail
+            var existGenreDetails = _context.DetailGenre.Where(dg => dg.IdGame == idGame);
+            _context.DetailGenre.RemoveRange(existGenreDetails);
+
+            // add new genre detail
+            var listGenreDetailResult = new List<DetailGenre>();
+            if (listGenreDetail.Count > 0)
+            {
+                foreach (var genreDetail in listGenreDetail)
+                {
+                    var existGenre = _context.Genre.FirstOrDefault(g => g.IdGenre == genreDetail);
+                    if (existGenre == null) return NotFound(new { message = "Not found genre " + genreDetail });
+                    var newGenreDetail = new DetailGenre() { IdGame = idGame, IdGenre = genreDetail };
+                    listGenreDetailResult.Add(newGenreDetail);
+                }
+                _context.DetailGenre.AddRange(listGenreDetailResult);
+            }
+
+            _context.GameVersion.Add(newVersionGame);
+            _context.SaveChanges();
+
+            var listImageGameDto = customMapper.CustomMapListImageGameDetail(listImageDetailResult);
+            var newGameDto = _mapper.Map<Game, GameDto>(newGame);
+            newGameDto.ImageGameDetail = listImageGameDto;
+            newGameDto.Genres = customMapper.CustomMappDetailGenre(listGenreDetailResult);
+            var newGameVersionDto = _mapper.Map<GameVersion, GameVersionDto>(newVersionGame);
+
+            return Ok(new { newGameDto, newGameVersionDto });
+        }
+
         [HttpGet("more-like-this/{idGame}/{amount}")]
         public IActionResult GetGameMoreLikeThis(string idGame, int amount)
         {
@@ -152,6 +220,22 @@ namespace game_store_be.Controllers
                 .Take(amount);
 
             return Ok(gameMoreLikeThis);
+        }
+        [Authorize]
+        [HttpGet("installed")]
+        public IActionResult UpdateDownloadedOfGame(){
+
+            string gameId = HttpContext.Request.Headers["idGame"];
+
+            var gameExist = _context.Game.FirstOrDefault(g => g.IdGame == gameId);
+            if (gameExist != null)
+            {
+                gameExist.NumberOfDownloaders += 1;
+                _context.SaveChanges();
+                return Ok(gameExist.NumberOfDownloaders);
+            }
+
+            return NotFound();
         }
     }
 }

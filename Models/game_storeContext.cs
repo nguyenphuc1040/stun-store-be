@@ -29,7 +29,6 @@ namespace game_store_be.Models
         public virtual DbSet<WishList> WishList { get; set; }
         public virtual DbSet<Suggestion> Suggestion { get; set; }
         public virtual DbSet<LikeComment> LikeComment { get; set; }
-        public virtual DbSet<DisLikeComment> DisLikeComment { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -397,7 +396,6 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.UrlDowload)
                     .HasColumnName("urlDowload")
-                    .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.Property(e => e.VersionGame)
@@ -450,7 +448,6 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.Url)
                     .HasColumnName("url")
-                    .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.IdGameNavigation)
@@ -473,7 +470,6 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.UrlVideo)
                     .HasColumnName("urlVideo")
-                    .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.IdGameNavigation)

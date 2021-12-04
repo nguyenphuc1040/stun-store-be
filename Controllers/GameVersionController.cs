@@ -97,7 +97,9 @@ namespace game_store_be.Controllers
             if (existGameVersion == null) return NotFound(new { message = "Version not found" });
 
 
-            var imageDetail = _context.ImageGameDetail.Where(i => i.IdGame == idGame);
+            var imageDetail = _context.ImageGameDetail
+                                .Where(i => i.IdGame == idGame)
+                                .OrderBy(i => i.Url);
 
             var existGameDto = customMapper.CustomMapGame(existGame);
             var existGameversionDto = _mapper.Map<GameVersion, GameVersionDto>(existGameVersion);
@@ -113,12 +115,14 @@ namespace game_store_be.Controllers
         public IActionResult GetUrlDownloadByIdGameVersion()
         {
             string gameVer = HttpContext.Request.Headers["idGameVersion"];
-            var urlDownload = _context.GameVersion
-                .First(gv => gv.IdGameVersion == gameVer).UrlDowload;
+            var gameVersionExist = _context.GameVersion
+                .FirstOrDefault(gv => gv.IdGameVersion == gameVer);
+            if (gameVersionExist != null)
+            {
+                return Ok(gameVersionExist.UrlDowload);
+            }
 
-            return Ok(urlDownload);
+            return NotFound(new { message = "Not found game version" });
         }
-
-
     }
 }

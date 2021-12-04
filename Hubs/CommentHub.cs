@@ -25,6 +25,7 @@ namespace game_store_be.Hubs
 
         public async Task SendMessage(string comment)
         {
+           
             if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
 
@@ -51,12 +52,11 @@ namespace game_store_be.Hubs
                 newCmt.Time = DateTime.UtcNow;
                 _context.Comments.Add(newCmt);
                 _context.SaveChanges();
-              /*  var commentsDto = _mapper.Map<Comments, CommentsDto>(newCmt);*/
                 await Clients.Group(userConnection.Room)
                     .SendAsync("ReceiveCreateComment", userConnection.User, newCmt);
             }
         }
-        public async Task UpdateComment(Comments updateCmt)
+        public async Task UpdateComment(Comments updateCmt,string idUserLike, string action)
         {
             if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
@@ -64,6 +64,59 @@ namespace game_store_be.Hubs
                     .FirstOrDefault(cmt => cmt.IdComment == updateCmt.IdComment);
                 if (existCmt != null)
                 {
+                    var existLikeComment = _context.LikeComment
+                        .FirstOrDefault(e => e.IdComment == updateCmt.IdComment && e.IdUser == idUserLike);
+                    switch (action){
+                        case "like":
+                            if (existLikeComment == null){
+                                updateCmt.Likes ++;
+                                LikeComment newLikeCmt = new LikeComment(
+                                    updateCmt.IdComment, idUserLike, true
+                                );
+                                _context.LikeComment.Add(newLikeCmt);
+                                _context.SaveChanges();
+                            } else
+                            if (existLikeComment.IsLike) {
+                                updateCmt.Likes --;
+                                _context.LikeComment.Remove(existLikeComment);
+                                _context.SaveChanges();
+                            } else {
+                                updateCmt.Likes ++;
+                                updateCmt.Dislike --;
+                                LikeComment newLikeCmt = existLikeComment;
+                                newLikeCmt.IsLike = true;
+                                _mapper.Map(newLikeCmt, existLikeComment);
+                                _context.SaveChanges();
+                            }
+                            break;
+                        case "dislike":
+                            if (existLikeComment == null){
+                                updateCmt.Dislike ++;
+                                LikeComment newLikeCmt = new LikeComment(
+                                    updateCmt.IdComment, idUserLike, false
+                                );
+                                _context.LikeComment.Add(newLikeCmt);
+                                _context.SaveChanges();
+                            } else
+                            if (!existLikeComment.IsLike){
+                                updateCmt.Dislike --;
+                                _context.LikeComment.Remove(existLikeComment);
+                                _context.SaveChanges();
+                            } else {
+                                updateCmt.Likes --;
+                                updateCmt.Dislike ++;
+                                LikeComment newLikeCmt = existLikeComment;
+                                newLikeCmt.IsLike = false;
+                                _mapper.Map(newLikeCmt, existLikeComment);
+                                _context.SaveChanges();
+                            }
+                            break;
+                        case "change-content":
+                            break;
+                    }
+                    existCmt.Likes = updateCmt.Likes;
+                    existCmt.Dislike = updateCmt.Dislike;
+                    existCmt.Content = updateCmt.Content;
                     _mapper.Map(updateCmt, existCmt);
                     _context.SaveChanges();
                     await Clients.Group(userConnection.Room)
@@ -73,6 +126,7 @@ namespace game_store_be.Hubs
                     await Clients.Group(userConnection.Room)
                         .SendAsync("ReceiveMessage", userConnection.User, "404");
                 }
+
             }
         }
 
@@ -81,10 +135,15 @@ namespace game_store_be.Hubs
             if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
                 var existCmt = _context.Comments
-                .FirstOrDefault(cmt => cmt.IdComment == idComment);
+                    .FirstOrDefault(cmt => cmt.IdComment == idComment);
                 if (existCmt != null)
                 {
                     _context.Comments.Remove(existCmt);
+                    var likeCmtOfThisCmt = _context.LikeComment
+                        .Where(e => e.IdUser == existCmt.IdUser)
+                        .ToList();
+                    _context.LikeComment.RemoveRange(likeCmtOfThisCmt);
+                    _context.SaveChanges();
                     await Clients.Group(userConnection.Room)
                         .SendAsync("ReceiveDeleteComment", userConnection.User, idComment);
                 } else
@@ -94,5 +153,7 @@ namespace game_store_be.Hubs
                 }
             }
         }
+
+      
     }
 }

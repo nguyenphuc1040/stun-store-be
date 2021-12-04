@@ -27,10 +27,19 @@ namespace game_store_be.Controllers
         public IActionResult GetCommentByIdGame(string idGame)
         {
             var comments = _context.Comments
-                .Where(cmt => cmt.IdGame == idGame).ToList();
+                .Where(cmt => cmt.IdGame == idGame)
+                .OrderBy(cmt => cmt.Time).ToList();
             var commentsDto = _mapper.Map<IEnumerable<CommentsDto>>(comments);
 
             return Ok(commentsDto);
+        }
+        [HttpGet("count/{idGame}")]
+        public IActionResult GetCommentCountByIdGame(string idGame)
+        {
+            var comments = _context.Comments
+                .Where(cmt => cmt.IdGame == idGame).Count();
+
+            return Ok(comments);
         }
         [HttpGet]
         public IActionResult GetAllComment()
@@ -39,6 +48,14 @@ namespace game_store_be.Controllers
             var commentsDto = _mapper.Map<IEnumerable<CommentsDto>>(comments);
 
             return Ok(commentsDto);
+        }
+
+        [HttpGet("{idGame}/{idUser}")]
+        public IActionResult GetCommentOfGameOfUser(string idGame, string idUser){
+            
+            var comments = _context.Comments
+                .FirstOrDefault(cmt => cmt.IdUser == idUser && cmt.IdGame == idGame);
+            return Ok(comments);
         }
     }
 }
