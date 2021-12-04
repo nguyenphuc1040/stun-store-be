@@ -150,6 +150,7 @@ namespace game_store_be.Controllers
             var existGame = GetGameByIdService(idGame);
 
             if (existGame == null) return NotFound(new { message = "Game not found" });
+            _mapper.Map(newGame, existGame);
 
             // remove old images
             var existImageDetails = _context.ImageGameDetail.Where(imgD => imgD.IdGame == idGame);
@@ -185,7 +186,6 @@ namespace game_store_be.Controllers
                 _context.DetailGenre.AddRange(listGenreDetailResult);
             }
 
-            _mapper.Map(newGame, existGame);
             _context.GameVersion.Add(newVersionGame);
             _context.SaveChanges();
 
