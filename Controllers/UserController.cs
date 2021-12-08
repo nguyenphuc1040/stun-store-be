@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Net;
+using AutoMapper;
 using game_store_be.CustomModel;
 using game_store_be.Dtos;
 using game_store_be.Models;
@@ -17,6 +18,7 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using SmtpManager;
 
 namespace game_store_be.Controllers
 {
@@ -28,6 +30,7 @@ namespace game_store_be.Controllers
         private readonly game_storeContext _context;
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
+        private static Hashtable codeVerify = new Hashtable();
         public UserController(game_storeContext context, IMapper mapper, IConfiguration configuration)
         {
             _context = context;
@@ -189,6 +192,80 @@ namespace game_store_be.Controllers
             _context.Users.Add(newUser);
             _context.SaveChanges();
             return newUser;
+        }
+
+        [AllowAnonymous]
+        [HttpGet("check-valid-username/{username}")]
+        public IActionResult CheckValidUsername(string username){
+            var existUsername = _context.Users.FirstOrDefault(u => u.UserName == username);
+            if (existUsername == null) {
+                return Ok(new { message = "valid"});
+            } else {
+                return Ok(new { message = "invalid"});
+            }              
+        }
+
+        [HttpPost("change-password")]
+        public IActionResult ChangePassword(){
+            string idUser = HttpContext.Request.Headers["idUser"];
+            string pwd = HttpContext.Request.Headers["pwd"];
+
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
+
+            if (existUser == null) {
+                return NotFound(new {message = "User not exists"});
+            }
+            existUser.Password = HassPassword(pwd);
+            _context.SaveChanges();
+            return Ok(new {message = "Change password sucessful !"});
+        }
+
+        [HttpPut("change-info/{idUser}")]
+        public IActionResult ChangeInfo(string idUser,[FromBody] Users infoUser){
+            
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
+
+            if (existUser == null) {
+                return NotFound(new {message = "User not exists"});
+            }
+            if (infoUser.Avatar != null) existUser.Avatar = infoUser.Avatar;
+            if (infoUser.RealName != null) existUser.RealName = infoUser.RealName;
+            if (infoUser.Background != null) existUser.Background = infoUser.Background;
+            _context.SaveChanges(); 
+            return Ok(existUser);
+        }
+        [AllowAnonymous]
+        [HttpPost("send-mail-reset-pwd/{email}")]
+        public IActionResult SendMailResetPwd(string email){
+            var existUser = _context.Users.FirstOrDefault(u => u.Email == email);
+            if (existUser == null) return NotFound(new {message = "Email is not registered"});
+            var rand = new Random();
+            string code = rand.Next(111111,988888).ToString();
+            codeVerify[email] = code;
+            bool result = SmtpController.CreateResetPasswordVerify(email,code);
+            return Ok(new {message = result});
+        }
+        [AllowAnonymous]
+        [HttpPost("send-mail-confirm-account/{email}")]
+        public IActionResult SendMailConfirmAccount(string email){
+            var rand = new Random();
+            string code = rand.Next(111111,988888).ToString();
+            codeVerify[email] = code;
+            bool result = SmtpController.CreateEmailVerify(email,code);
+            return Ok(new {message = result});
+        }
+        [AllowAnonymous]
+        [HttpGet("code/{email}/{code}")]
+        public IActionResult Code(string email, string code){
+            if (codeVerify[email]==null){
+                return NotFound(new {message = "not found"});
+            } else {
+                var result = codeVerify[email].ToString()==code ? true : false;
+                if (result) {
+                    codeVerify.Remove(email);
+                }
+                return Ok(new {message = result});
+            }
         }
     }
 }
