@@ -29,6 +29,7 @@ namespace game_store_be.Models
         public string LastestVersion { get; set; }
         public int? NumberOfBuyer { get; set; }
         public int? NumberOfDownloaders { get; set; }
+        public string UrlVideo {get; set;}
 
         public virtual Discount IdDiscountNavigation { get; set; }
         public virtual SlideGameHot SlideGameHot { get; set; }

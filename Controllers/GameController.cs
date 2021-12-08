@@ -132,8 +132,9 @@ namespace game_store_be.Controllers
             return Ok(new { newGameDto, newGameVersionDto });
         }
 
-        [HttpPut("update/{idGame}")]
-        public IActionResult UpdateGame(string idGame, [FromBody] PostGameBody newGameBody)
+        [Authorize(Roles = "admin")]
+        [HttpPut("create-update/{idGame}")]
+        public IActionResult CreateNewUpdate(string idGame, [FromBody] PostGameBody newGameBody)
         {
             var customMapper = new CustomMapper(_mapper);
             var newGame = newGameBody.Game;
@@ -150,6 +151,8 @@ namespace game_store_be.Controllers
             var existGame = GetGameByIdService(idGame);
 
             if (existGame == null) return NotFound(new { message = "Game not found" });
+            newGame.Plaform = existGame.Plaform;
+            newGame.Cost = existGame.Cost;
             _mapper.Map(newGame, existGame);
 
             // remove old images
@@ -196,6 +199,77 @@ namespace game_store_be.Controllers
             var newGameVersionDto = _mapper.Map<GameVersion, GameVersionDto>(newVersionGame);
 
             return Ok(new { newGameDto, newGameVersionDto });
+        }
+        
+
+        [HttpPut("update/{idGame}")]
+        public IActionResult Update(string idGame, [FromBody] PostGameBody newGameBody)
+        {
+            var customMapper = new CustomMapper(_mapper);
+            var newGame = newGameBody.Game;
+            var listImageDetail = newGameBody.ListImageDetail;
+            var listGenreDetail = newGameBody.ListGenreDetail;
+
+            newGame.IdGame = idGame;
+
+            var existGame = GetGameByIdService(idGame);
+
+            if (existGame == null) return NotFound(new { message = "Game not found" });
+            // existGame.NameGame = newGame.NameGame;
+            // existGame.Developer = newGame.Developer;
+            // existGame.Publisher = newGame.Publisher;
+            // existGame.urlVideo = newGame.urlVideo;
+            _mapper.Map(newGame, existGame);
+
+            // remove old images
+            var existImageDetails = _context.ImageGameDetail.Where(imgD => imgD.IdGame == idGame);
+            _context.ImageGameDetail.RemoveRange(existImageDetails);
+
+            // add new images
+            var listImageDetailResult = new List<ImageGameDetail>();
+            if (listImageDetail.Count > 0)
+            {
+                foreach (var imageDetail in listImageDetail)
+                {
+                    var newImageDetail = new ImageGameDetail() { IdImage = Guid.NewGuid().ToString(), IdGame = idGame, Url = imageDetail };
+                    listImageDetailResult.Add(newImageDetail);
+                }
+                _context.ImageGameDetail.AddRange(listImageDetailResult);
+            }
+
+            // remove old genreDetail
+            var existGenreDetails = _context.DetailGenre.Where(dg => dg.IdGame == idGame);
+            _context.DetailGenre.RemoveRange(existGenreDetails);
+
+            // add new genre detail
+            var listGenreDetailResult = new List<DetailGenre>();
+            if (listGenreDetail.Count > 0)
+            {
+                foreach (var genreDetail in listGenreDetail)
+                {
+                    var existGenre = _context.Genre.FirstOrDefault(g => g.IdGenre == genreDetail);
+                    if (existGenre == null) return NotFound(new { message = "Not found genre " + genreDetail });
+                    var newGenreDetail = new DetailGenre() { IdGame = idGame, IdGenre = genreDetail };
+                    listGenreDetailResult.Add(newGenreDetail);
+                }
+                _context.DetailGenre.AddRange(listGenreDetailResult);
+            }
+
+            _context.SaveChanges();
+
+            var listImageGameDto = customMapper.CustomMapListImageGameDetail(listImageDetailResult);
+            var newGameDto = _mapper.Map<Game, GameDto>(newGame);
+            newGameDto.ImageGameDetail = listImageGameDto;
+            newGameDto.Genres = customMapper.CustomMappDetailGenre(listGenreDetailResult);
+
+            return Ok(new { newGameDto });
+        }
+        [Authorize(Roles = "admin")]
+        [HttpGet("check-version-exist/{idGame}/{version}")]
+        public IActionResult CheckVersionExist(string idGame, string version){
+            var existGame = _context.GameVersion.FirstOrDefault(g => g.IdGame == idGame && g.VersionGame == version);
+            if (existGame == null) return Ok(new {message = "no"});
+                else return Ok(new {message = "yes"});
         }
 
         [HttpGet("more-like-this/{idGame}/{amount}")]

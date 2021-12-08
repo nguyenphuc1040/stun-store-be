@@ -130,7 +130,8 @@ namespace game_store_be.Controllers
 
             if (lastToken == null || lastToken == "")
             {
-                var existUser = _context.Users.FirstOrDefault(u => u.Email == infoLogin.Email && u.Password == HassPassword(infoLogin.Password));
+                var existUser = _context.Users
+                    .FirstOrDefault(u => (u.Email == infoLogin.Email || u.UserName == infoLogin.Email) && u.Password == HassPassword(infoLogin.Password));
 
                 if (existUser == null)
                 {
@@ -162,6 +163,32 @@ namespace game_store_be.Controllers
             _mapper.Map(newUser, existUser);
             _context.SaveChanges();
             return Ok(newUser);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("login-sma")]
+        public IActionResult LoginWithGoogle([FromBody] LoginWithSMA infoLogin)
+        {
+            var existUser = _context.Users
+                            .FirstOrDefault(u => u.Email == infoLogin.ILogin.Email);
+            
+            if (existUser == null)
+            {
+                return Ok(CreateResLoginSuccess(RegisterAccount(infoLogin.IUser)));
+            }
+
+            return Ok(CreateResLoginSuccess(existUser));
+        }
+
+        public Users RegisterAccount(Users newUser)
+        {
+            newUser.IdUser = Guid.NewGuid().ToString();
+            newUser.Password = null;
+            newUser.Roles = "user";
+
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+            return newUser;
         }
     }
 }

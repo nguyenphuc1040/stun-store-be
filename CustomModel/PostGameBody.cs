@@ -14,4 +14,5 @@ namespace game_store_be.CustomModel
         public List<string>? ListImageDetail { get; set; }
         public List<string>? ListGenreDetail { get; set; }
     }
+
 }
