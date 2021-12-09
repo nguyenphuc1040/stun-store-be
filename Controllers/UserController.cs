@@ -114,13 +114,17 @@ namespace game_store_be.Controllers
         [HttpPost("register")]
         public IActionResult Register([FromBody] Users newUser)
         {
+            var existUser = _context.Users.FirstOrDefault(u => u.Email == newUser.Email);
+            if (existUser != null) return NotFound("Email already register");
+
             newUser.IdUser = Guid.NewGuid().ToString();
             newUser.Password = HassPassword(newUser.Password);
             newUser.Roles = "user";
+            newUser.Avatar = "https://ui-avatars.com/api/?name=" + newUser.UserName;
 
             _context.Users.Add(newUser);
             _context.SaveChanges();
-            return Ok(newUser);
+            return Ok(new {message = "Register Sucessful !"});
         }
 
         [AllowAnonymous]
@@ -193,15 +197,24 @@ namespace game_store_be.Controllers
             _context.SaveChanges();
             return newUser;
         }
-
+        [AllowAnonymous]
+        [HttpGet("check-valid-email/{email}")]
+        public IActionResult CheckValidEmail(string email){
+            var existUsername = _context.Users.FirstOrDefault(u => u.Email == email);
+            if (existUsername == null) {
+                return Ok("valid");
+            } else {
+                return NotFound("Email already register");
+            }              
+        }
         [AllowAnonymous]
         [HttpGet("check-valid-username/{username}")]
         public IActionResult CheckValidUsername(string username){
             var existUsername = _context.Users.FirstOrDefault(u => u.UserName == username);
             if (existUsername == null) {
-                return Ok(new { message = "valid"});
+                return Ok("valid");
             } else {
-                return Ok(new { message = "invalid"});
+                return NotFound("Stun ID already exist");
             }              
         }
 
@@ -213,11 +226,11 @@ namespace game_store_be.Controllers
             var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
 
             if (existUser == null) {
-                return NotFound(new {message = "User not exists"});
+                return NotFound("User not exists");
             }
             existUser.Password = HassPassword(pwd);
             _context.SaveChanges();
-            return Ok(new {message = "Change password sucessful !"});
+            return Ok("Change password sucessful !");
         }
 
         [HttpPut("change-info/{idUser}")]
@@ -226,46 +239,85 @@ namespace game_store_be.Controllers
             var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
 
             if (existUser == null) {
-                return NotFound(new {message = "User not exists"});
+                return NotFound("User not exists");
             }
             if (infoUser.Avatar != null) existUser.Avatar = infoUser.Avatar;
             if (infoUser.RealName != null) existUser.RealName = infoUser.RealName;
             if (infoUser.Background != null) existUser.Background = infoUser.Background;
             _context.SaveChanges(); 
-            return Ok(existUser);
+            var userDto = _mapper.Map<Users, UserDto>(existUser);
+            return Ok(userDto);
         }
         [AllowAnonymous]
-        [HttpPost("send-mail-reset-pwd/{email}")]
-        public IActionResult SendMailResetPwd(string email){
+        [HttpPost("send-mail-reset-pwd")]
+        public IActionResult SendMailResetPwd(){
+            string email = HttpContext.Request.Headers["email"];
             var existUser = _context.Users.FirstOrDefault(u => u.Email == email);
-            if (existUser == null) return NotFound(new {message = "Email is not registered"});
+            if (existUser == null) return NotFound("Email is not registered");
             var rand = new Random();
             string code = rand.Next(111111,988888).ToString();
             codeVerify[email] = code;
-            bool result = SmtpController.CreateResetPasswordVerify(email,code);
+            bool result = SmtpController.CreateResetPasswordVerify(existUser.Email,code,existUser.IdUser);
             return Ok(new {message = result});
         }
         [AllowAnonymous]
-        [HttpPost("send-mail-confirm-account/{email}")]
-        public IActionResult SendMailConfirmAccount(string email){
+        [HttpPost("send-mail-confirm-account")]
+        public IActionResult SendMailConfirmAccount(){
+            string email = HttpContext.Request.Headers["email"];
+            var existUser = _context.Users.FirstOrDefault(u => u.Email == email);
+            if (existUser == null) return NotFound("Email is not registered");
             var rand = new Random();
             string code = rand.Next(111111,988888).ToString();
             codeVerify[email] = code;
-            bool result = SmtpController.CreateEmailVerify(email,code);
+            bool result = SmtpController.CreateEmailVerify(email, code, existUser.IdUser);
             return Ok(new {message = result});
         }
         [AllowAnonymous]
-        [HttpGet("code/{email}/{code}")]
-        public IActionResult Code(string email, string code){
-            if (codeVerify[email]==null){
-                return NotFound(new {message = "not found"});
+        [HttpPost("verification/code")]
+        public IActionResult CodeVerify([FromBody] Verification info){
+            var existUser = _context.Users.FirstOrDefault(u => u.Email == info.Email);
+            if (existUser == null) return NotFound("User not exists");
+            if (codeVerify[info.Email]==null){
+                return NotFound(new {message = "Fail to verification"});
             } else {
-                var result = codeVerify[email].ToString()==code ? true : false;
+                var result = codeVerify[info.Email].ToString()==info.Code ? true : false;
                 if (result) {
-                    codeVerify.Remove(email);
+                    codeVerify.Remove(info.Email);
+                    var userDto = _mapper.Map<Users, UserDto>(existUser);
+                    return Ok(userDto);
                 }
-                return Ok(new {message = result});
+                return Ok(new {message = "Fail to verification"});
             }
+        }
+        [AllowAnonymous]
+        [HttpPost("verification/link")]
+        public IActionResult LinkVerify(){
+            string url = HttpContext.Request.Headers["url"];
+            string code = "";
+            int j = 1;
+            for (int i=0; i<6; i++) {
+                code += (char)(url[j]-49);
+                j+= 3;
+            }
+            j = 1;
+            for (int i=0; i<6; i++) {
+                url = url.Remove(j,1);
+                j+=2;
+            }
+            Console.WriteLine(url);
+                  Console.WriteLine(code);
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == url);
+            if (existUser == null) return NotFound(new {message = "User not exists"});
+            if (codeVerify[existUser.Email]==null){
+                return NotFound(new {message = "Fail to verification"});
+            } 
+            var result = codeVerify[existUser.Email].ToString() == code ? true : false;
+            if (result){
+                codeVerify.Remove(existUser.Email);
+                var userDto = _mapper.Map<Users, UserDto>(existUser);
+                return Ok(userDto);
+            }
+            return Ok("Fail to verification");
         }
     }
 }

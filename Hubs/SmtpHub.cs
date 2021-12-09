@@ -1,20 +1,87 @@
 using System;
 using System.Net;
 using System.Net.Mail;
-using System.Net.Mime;
-using System.Threading;
-using System.ComponentModel;
+
 namespace SmtpManager
 {
     [Serializable]
     public class SmtpController
     {
-        public static bool CreateEmailVerify(string toAdress, string code)
+        public static bool CreateEmailVerify(string toAdress, string code, string idUser)
         {
-            string from = "stun.services@gmail.com";
-            MailMessage message = new MailMessage(from, toAdress);
+            string url = ProcessLinkCode(code,idUser);
+
+            MailMessage message = new MailMessage(GetUserName(), toAdress);
             message.Subject = "Stun Store - Confirm your Account";
-            message.Body = @"<html>
+            message.Body = GetConfirmAccountMailBody(code,url);
+            message.IsBodyHtml = true;
+            using SmtpClient client = new SmtpClient{
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                EnableSsl = true,
+                Host = "smtp.gmail.com",
+                Port = 587,
+                Credentials = new NetworkCredential(GetUserName(),GetPassword())
+            };
+
+            try
+            {
+                client.Send(message);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception caught in CreateTestMessage2(): {0}",
+                    ex.ToString());
+                return false;
+            }
+        }        
+        public static bool CreateResetPasswordVerify(string toAdress, string code, string idUser)
+        {
+            string url = ProcessLinkCode(code,idUser);
+
+            MailMessage message = new MailMessage(GetUserName(), toAdress);
+            message.Subject = "Stun Store - Reset password";
+            message.Body = GetResetPasswordMailBody(code,url);
+            message.IsBodyHtml = true;
+            using SmtpClient client = new SmtpClient{
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                EnableSsl = true,
+                Host = "smtp.gmail.com",
+                Port = 587,
+                Credentials = new NetworkCredential(GetUserName(),GetPassword())
+            };
+
+            try
+            {
+                client.Send(message);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception caught in CreateTestMessage2(): {0}",
+                    ex.ToString());
+                return false;
+            }
+        }        
+        private static string ProcessLinkCode(string code, string idUser){
+            int i = 1;
+            string url = idUser;
+            foreach(char item in code){
+                url = url.Insert(i,((char)(item+49)).ToString());
+                i+= 3;
+            }
+            return url;
+        }
+        public static string GetUserName(){
+            return "stun.services@gmail.com";
+        }
+        public static string GetPassword(){
+            return "71311147601";
+        }
+        public static string GetConfirmAccountMailBody(string code, string url){
+            return @"<html>
                                 <head>
                                     <style type='text/css'>
                                         h1 {
@@ -58,7 +125,7 @@ namespace SmtpManager
                                                 transition: .3s;
                                                 text-align: center;
                                                 padding-top: 13px;
-                                                text-decoration: none;' href='https://stun-store.vercel.app/email-verify/{code}'>
+                                                text-decoration: none;' href='https://stun-store.vercel.app/email-verify/{url}'>
                                                     Confirm Account
                                                 </a>
                                             </div>
@@ -77,34 +144,9 @@ namespace SmtpManager
                                     </div>
                                 </body>
                                 </html>";
-            message.IsBodyHtml = true;
-            using SmtpClient client = new SmtpClient{
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                EnableSsl = true,
-                Host = "smtp.gmail.com",
-                Port = 587,
-                Credentials = new NetworkCredential(GetUserName(),GetPassword())
-            };
-
-            try
-            {
-                client.Send(message);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception caught in CreateTestMessage2(): {0}",
-                    ex.ToString());
-                return false;
-            }
-        }        
-        public static bool CreateResetPasswordVerify(string toAdress, string code)
-        {
-            string from = "stun.services@gmail.com";
-            MailMessage message = new MailMessage(from, toAdress);
-            message.Subject = "Stun Store - Reset password";
-            message.Body = @"<html>
+        }
+        public static string GetResetPasswordMailBody(string code, string url){
+            return @"<html>
                             <head>
                                 <style type='text/css'>
                                     h1 {
@@ -148,7 +190,7 @@ namespace SmtpManager
                                             transition: .3s;
                                             text-align: center;
                                             padding-top: 13px;
-                                            text-decoration: none;' href='https://stun-store.vercel.app/reset-password/{code}'>
+                                            text-decoration: none;' href='https://stun-store.vercel.app/reset-pwd-verify/{url}'>
                                                 Reset Password
                                             </a>
                                         </div>
@@ -167,34 +209,6 @@ namespace SmtpManager
                                 </div>
                             </body>
                             </html>";
-            message.IsBodyHtml = true;
-            using SmtpClient client = new SmtpClient{
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                UseDefaultCredentials = false,
-                EnableSsl = true,
-                Host = "smtp.gmail.com",
-                Port = 587,
-                Credentials = new NetworkCredential(GetUserName(),GetPassword())
-            };
-
-            try
-            {
-                client.Send(message);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Exception caught in CreateTestMessage2(): {0}",
-                    ex.ToString());
-                return false;
-            }
-        }        
-        public static string GetUserName(){
-            return "stun.services@gmail.com";
         }
-        public static string GetPassword(){
-            return "71311147601";
-        }
-    
     }
 }

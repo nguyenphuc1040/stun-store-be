@@ -16,4 +16,9 @@ namespace game_store_be.Models
         public Login ILogin { get; set; }
         public Users IUser { get; set; }
     }
+
+    public class Verification {
+        public string Email { get; set; }
+        public string Code { get; set; }
+    }
 }
