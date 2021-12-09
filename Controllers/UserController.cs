@@ -121,7 +121,7 @@ namespace game_store_be.Controllers
             newUser.Password = HassPassword(newUser.Password);
             newUser.Roles = "user";
             newUser.Avatar = "https://ui-avatars.com/api/?name=" + newUser.UserName;
-
+            newUser.ConfirmEmail = false;
             _context.Users.Add(newUser);
             _context.SaveChanges();
             return Ok(new {message = "Register Sucessful !"});
@@ -283,6 +283,8 @@ namespace game_store_be.Controllers
                 var result = codeVerify[info.Email].ToString()==info.Code ? true : false;
                 if (result) {
                     codeVerify.Remove(info.Email);
+                    existUser.ConfirmEmail = true;
+                    _context.SaveChanges();
                     var userDto = _mapper.Map<Users, UserDto>(existUser);
                     return Ok(userDto);
                 }
@@ -314,10 +316,13 @@ namespace game_store_be.Controllers
             var result = codeVerify[existUser.Email].ToString() == code ? true : false;
             if (result){
                 codeVerify.Remove(existUser.Email);
+                existUser.ConfirmEmail = true;
+                _context.SaveChanges();
                 var userDto = _mapper.Map<Users, UserDto>(existUser);
                 return Ok(userDto);
             }
             return Ok("Fail to verification");
         }
+
     }
 }
