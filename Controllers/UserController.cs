@@ -116,6 +116,8 @@ namespace game_store_be.Controllers
         {
             var existUser = _context.Users.FirstOrDefault(u => u.Email == newUser.Email);
             if (existUser != null) return NotFound("Email already register");
+            existUser = _context.Users.FirstOrDefault(u => u.UserName == newUser.UserName);
+            if (existUser != null) return NotFound("Username already register");
 
             newUser.IdUser = Guid.NewGuid().ToString();
             newUser.Password = HassPassword(newUser.Password);
@@ -270,7 +272,7 @@ namespace game_store_be.Controllers
             string code = rand.Next(111111,988888).ToString();
             codeVerify[email] = code;
             bool result = SmtpController.CreateEmailVerify(email, code, existUser.IdUser);
-            return Ok(new {message = result});
+            return Ok(result);
         }
         [AllowAnonymous]
         [HttpPost("verification/code")]
@@ -285,10 +287,9 @@ namespace game_store_be.Controllers
                     codeVerify.Remove(info.Email);
                     existUser.ConfirmEmail = true;
                     _context.SaveChanges();
-                    var userDto = _mapper.Map<Users, UserDto>(existUser);
-                    return Ok(userDto);
+                    return Ok(CreateResLoginSuccess(existUser));
                 }
-                return Ok(new {message = "Fail to verification"});
+                return NotFound("Code Wrong, Try Again");
             }
         }
         [AllowAnonymous]
@@ -311,17 +312,16 @@ namespace game_store_be.Controllers
             var existUser = _context.Users.FirstOrDefault(u => u.IdUser == url);
             if (existUser == null) return NotFound(new {message = "User not exists"});
             if (codeVerify[existUser.Email]==null){
-                return NotFound(new {message = "Fail to verification"});
+                return NotFound("Fail to verification");
             } 
             var result = codeVerify[existUser.Email].ToString() == code ? true : false;
             if (result){
                 codeVerify.Remove(existUser.Email);
                 existUser.ConfirmEmail = true;
                 _context.SaveChanges();
-                var userDto = _mapper.Map<Users, UserDto>(existUser);
-                return Ok(userDto);
+                return Ok(CreateResLoginSuccess(existUser));
             }
-            return Ok("Fail to verification");
+            return NotFound("Fail to verification");
         }
 
     }
