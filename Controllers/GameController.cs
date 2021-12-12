@@ -311,5 +311,74 @@ namespace game_store_be.Controllers
 
             return NotFound();
         }
+        [HttpGet("lazy-load/browse")]
+        public IActionResult GetGameBrowse([FromBody] LazyLoadBrowseBody param){
+            List<GameDto> gameBrowse = new List<GameDto>();
+            if (param.ListGenreDetail == null || param.ListGenreDetail.Count() == 0) {
+                var games = GetGameBrowse();
+                var listGameDto = _mapper.Map<IEnumerable<GameDto>>(games);
+                gameBrowse.AddRange(listGameDto);
+            } else {
+                foreach(var genreItem in param.ListGenreDetail){
+                var games = _context.Game
+                            .Include(x => x.IdDiscountNavigation)
+                            .Include(x => x.DetailGenre)
+                                .ThenInclude(x => x.IdGenreNavigation)
+                            .Include(x => x.ImageGameDetail)
+                            .Join(
+                                _context.DetailGenre,
+                                game => game.IdGame,
+                                detailGenre => detailGenre.IdGame,
+                                (game, detailGenre) => new { detailGenre,game }
+                            )
+                            .AsNoTracking()
+                            .Where(e => e.detailGenre.IdGenre == genreItem);
+
+                List<Game> listGame = new List<Game>();
+                foreach (var gamesItem in games) listGame.Add(gamesItem.game);
+                var listGameDto = _mapper.Map<IEnumerable<GameDto>>(listGame);
+                for (var i = 0; i < listGameDto.Count(); i++)
+                {
+                    listGameDto.ToList().ElementAt(i).Discount = _mapper.Map<Discount, DiscountDto>(listGame.ToList().ElementAt(i).IdDiscountNavigation);
+                    listGameDto.ToList().ElementAt(i).Genres = _mapper.Map<ICollection<DetailGenreDto>>(listGame.ToList().ElementAt(i).DetailGenre);
+                    listGameDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(listGame.ToList().ElementAt(i).ImageGameDetail.OrderBy(i => i.Url));
+                }
+                gameBrowse.AddRange(listGameDto);
+            }
+            }
+            switch (param.sortBy){
+                case "abc":
+                    gameBrowse = gameBrowse.OrderBy(e => e.NameGame).ToList();
+                    break;
+                case "new-release":
+                    gameBrowse = gameBrowse.OrderByDescending(e => e.ReleaseDate).ToList();
+                    break;
+                case "price-to-high":
+                    gameBrowse = gameBrowse.OrderBy(e => e.Cost).ToList();
+                    break;
+                case "price-to-low":
+                    gameBrowse = gameBrowse.OrderByDescending(e => e.Cost).ToList();
+                    break;
+            }
+            var result = gameBrowse.Skip(param.start).Take(param.count).ToList();
+            if (result != null) return Ok(result);
+            return NotFound("Out of data");
+        }
+        public IEnumerable<GameDto> GetGameBrowse()
+        {
+            var games = _context.Game
+                .Include(x => x.IdDiscountNavigation)
+                .Include(x => x.DetailGenre)
+                    .ThenInclude(x => x.IdGenreNavigation)
+                .Include(x => x.ImageGameDetail);
+            var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
+            for (var i = 0; i < games.Count(); i++)
+            {
+                gamesDto.ToList().ElementAt(i).Discount = _mapper.Map<Discount, DiscountDto>(games.ToList().ElementAt(i).IdDiscountNavigation);
+                gamesDto.ToList().ElementAt(i).Genres = _mapper.Map<ICollection<DetailGenreDto>>(games.ToList().ElementAt(i).DetailGenre);
+                gamesDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(games.ToList().ElementAt(i).ImageGameDetail.OrderBy(i => i.Url));
+            }
+            return gamesDto;
+        }
     }
 }

@@ -19,6 +19,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using SmtpManager;
+using static Pirexcs.UserIC;
 
 namespace game_store_be.Controllers
 {
@@ -64,7 +65,7 @@ namespace game_store_be.Controllers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var claims = new Claim[]
             {
-                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Name, user.UserName.ToLower()),
                 new Claim(ClaimTypes.NameIdentifier, user.IdUser),
                 new Claim(ClaimTypes.Role, user.Roles),
             };
@@ -114,15 +115,15 @@ namespace game_store_be.Controllers
         [HttpPost("register")]
         public IActionResult Register([FromBody] Users newUser)
         {
-            var existUser = _context.Users.FirstOrDefault(u => u.Email == newUser.Email);
+            var existUser = _context.Users.FirstOrDefault(u => u.Email.ToLower() == newUser.Email.ToLower());
             if (existUser != null) return NotFound("Email already register");
-            existUser = _context.Users.FirstOrDefault(u => u.UserName == newUser.UserName);
+            existUser = _context.Users.FirstOrDefault(u => u.UserName.ToLower() == newUser.UserName.ToLower());
             if (existUser != null) return NotFound("Username already register");
 
             newUser.IdUser = Guid.NewGuid().ToString();
             newUser.Password = HassPassword(newUser.Password);
             newUser.Roles = "user";
-            newUser.Avatar = "https://ui-avatars.com/api/?name=" + newUser.UserName;
+            newUser.Avatar = CreateAvatar(newUser.UserName);
             newUser.ConfirmEmail = false;
             _context.Users.Add(newUser);
             _context.SaveChanges();
@@ -140,7 +141,7 @@ namespace game_store_be.Controllers
             if (lastToken == null || lastToken == "")
             {
                 var existUser = _context.Users
-                    .FirstOrDefault(u => (u.Email == infoLogin.Email || u.UserName == infoLogin.Email) && u.Password == HassPassword(infoLogin.Password));
+                    .FirstOrDefault(u => (u.Email.ToLower() == infoLogin.Email.ToLower() || u.UserName.ToLower() == infoLogin.Email.ToLower()) && u.Password == HassPassword(infoLogin.Password));
 
                 if (existUser == null)
                 {
@@ -176,25 +177,33 @@ namespace game_store_be.Controllers
 
         [AllowAnonymous]
         [HttpPost("login-sma")]
-        public IActionResult LoginWithGoogle([FromBody] LoginWithSMA infoLogin)
+        public IActionResult LoginWithSMA([FromBody] LoginWithSMA infoLogin)
         {
             var existUser = _context.Users
-                            .FirstOrDefault(u => u.Email == infoLogin.ILogin.Email);
+                            .FirstOrDefault(u => u.Email.ToLower() == infoLogin.ILogin.Email.ToLower());
             
             if (existUser == null)
             {
-                return Ok(CreateResLoginSuccess(RegisterAccount(infoLogin.IUser)));
+                return Ok(CreateResLoginSuccess(RegisterAccountSMA(infoLogin.IUser)));
             }
 
             return Ok(CreateResLoginSuccess(existUser));
         }
 
-        public Users RegisterAccount(Users newUser)
+        public Users RegisterAccountSMA(Users newUser)
         {
             newUser.IdUser = Guid.NewGuid().ToString();
             newUser.Password = null;
             newUser.Roles = "user";
-
+            var username ="";
+            while (true){
+                username = CreateUsername(newUser.RealName);
+                var existUsername = _context.Users.FirstOrDefault(u => u.UserName.ToLower() == username.ToLower());
+                if (existUsername == null) break;
+            }
+            
+            newUser.UserName = username;
+            newUser.Avatar = CreateAvatar(username);
             _context.Users.Add(newUser);
             _context.SaveChanges();
             return newUser;
@@ -202,7 +211,7 @@ namespace game_store_be.Controllers
         [AllowAnonymous]
         [HttpGet("check-valid-email/{email}")]
         public IActionResult CheckValidEmail(string email){
-            var existUsername = _context.Users.FirstOrDefault(u => u.Email == email);
+            var existUsername = _context.Users.FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
             if (existUsername == null) {
                 return Ok("valid");
             } else {
@@ -212,7 +221,7 @@ namespace game_store_be.Controllers
         [AllowAnonymous]
         [HttpGet("check-valid-username/{username}")]
         public IActionResult CheckValidUsername(string username){
-            var existUsername = _context.Users.FirstOrDefault(u => u.UserName == username);
+            var existUsername = _context.Users.FirstOrDefault(u => u.UserName.ToLower() == username.ToLower());
             if (existUsername == null) {
                 return Ok("valid");
             } else {
@@ -254,7 +263,8 @@ namespace game_store_be.Controllers
         [HttpPost("send-mail-reset-pwd")]
         public IActionResult SendMailResetPwd(){
             string email = HttpContext.Request.Headers["email"];
-            var existUser = _context.Users.FirstOrDefault(u => u.Email == email);
+            email = email.ToLower();
+            var existUser = _context.Users.FirstOrDefault(u => u.Email.ToLower() == email);
             if (existUser == null) return NotFound("Email is not registered");
             var rand = new Random();
             string code = rand.Next(111111,988888).ToString();
@@ -266,7 +276,8 @@ namespace game_store_be.Controllers
         [HttpPost("send-mail-confirm-account")]
         public IActionResult SendMailConfirmAccount(){
             string email = HttpContext.Request.Headers["email"];
-            var existUser = _context.Users.FirstOrDefault(u => u.Email == email);
+            email = email.ToLower();
+            var existUser = _context.Users.FirstOrDefault(u => u.Email.ToLower() == email);
             if (existUser == null) return NotFound("Email is not registered");
             var rand = new Random();
             string code = rand.Next(111111,988888).ToString();
@@ -277,10 +288,11 @@ namespace game_store_be.Controllers
         [AllowAnonymous]
         [HttpPost("verification/code")]
         public IActionResult CodeVerify([FromBody] Verification info){
-            var existUser = _context.Users.FirstOrDefault(u => u.Email == info.Email);
+            info.Email = info.Email.ToLower();
+            var existUser = _context.Users.FirstOrDefault(u => u.Email.ToLower() == info.Email);
             if (existUser == null) return NotFound("User not exists");
             if (codeVerify[info.Email]==null){
-                return NotFound(new {message = "Fail to verification"});
+                return NotFound("Fail to verification");
             } else {
                 var result = codeVerify[info.Email].ToString()==info.Code ? true : false;
                 if (result) {
@@ -323,6 +335,6 @@ namespace game_store_be.Controllers
             }
             return NotFound("Fail to verification");
         }
-
+        
     }
 }
