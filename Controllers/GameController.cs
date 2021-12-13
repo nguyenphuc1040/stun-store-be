@@ -132,8 +132,9 @@ namespace game_store_be.Controllers
             return Ok(new { newGameDto, newGameVersionDto });
         }
 
-        [HttpPut("update/{idGame}")]
-        public IActionResult UpdateGame(string idGame, [FromBody] PostGameBody newGameBody)
+        [Authorize(Roles = "admin")]
+        [HttpPut("create-update/{idGame}")]
+        public IActionResult CreateNewUpdate(string idGame, [FromBody] PostGameBody newGameBody)
         {
             var customMapper = new CustomMapper(_mapper);
             var newGame = newGameBody.Game;
@@ -150,6 +151,8 @@ namespace game_store_be.Controllers
             var existGame = GetGameByIdService(idGame);
 
             if (existGame == null) return NotFound(new { message = "Game not found" });
+            newGame.Plaform = existGame.Plaform;
+            newGame.Cost = existGame.Cost;
             _mapper.Map(newGame, existGame);
 
             // remove old images
@@ -197,6 +200,77 @@ namespace game_store_be.Controllers
 
             return Ok(new { newGameDto, newGameVersionDto });
         }
+        
+
+        [HttpPut("update/{idGame}")]
+        public IActionResult Update(string idGame, [FromBody] PostGameBody newGameBody)
+        {
+            var customMapper = new CustomMapper(_mapper);
+            var newGame = newGameBody.Game;
+            var listImageDetail = newGameBody.ListImageDetail;
+            var listGenreDetail = newGameBody.ListGenreDetail;
+
+            newGame.IdGame = idGame;
+
+            var existGame = GetGameByIdService(idGame);
+
+            if (existGame == null) return NotFound(new { message = "Game not found" });
+            // existGame.NameGame = newGame.NameGame;
+            // existGame.Developer = newGame.Developer;
+            // existGame.Publisher = newGame.Publisher;
+            // existGame.urlVideo = newGame.urlVideo;
+            _mapper.Map(newGame, existGame);
+
+            // remove old images
+            var existImageDetails = _context.ImageGameDetail.Where(imgD => imgD.IdGame == idGame);
+            _context.ImageGameDetail.RemoveRange(existImageDetails);
+
+            // add new images
+            var listImageDetailResult = new List<ImageGameDetail>();
+            if (listImageDetail.Count > 0)
+            {
+                foreach (var imageDetail in listImageDetail)
+                {
+                    var newImageDetail = new ImageGameDetail() { IdImage = Guid.NewGuid().ToString(), IdGame = idGame, Url = imageDetail };
+                    listImageDetailResult.Add(newImageDetail);
+                }
+                _context.ImageGameDetail.AddRange(listImageDetailResult);
+            }
+
+            // remove old genreDetail
+            var existGenreDetails = _context.DetailGenre.Where(dg => dg.IdGame == idGame);
+            _context.DetailGenre.RemoveRange(existGenreDetails);
+
+            // add new genre detail
+            var listGenreDetailResult = new List<DetailGenre>();
+            if (listGenreDetail.Count > 0)
+            {
+                foreach (var genreDetail in listGenreDetail)
+                {
+                    var existGenre = _context.Genre.FirstOrDefault(g => g.IdGenre == genreDetail);
+                    if (existGenre == null) return NotFound(new { message = "Not found genre " + genreDetail });
+                    var newGenreDetail = new DetailGenre() { IdGame = idGame, IdGenre = genreDetail };
+                    listGenreDetailResult.Add(newGenreDetail);
+                }
+                _context.DetailGenre.AddRange(listGenreDetailResult);
+            }
+
+            _context.SaveChanges();
+
+            var listImageGameDto = customMapper.CustomMapListImageGameDetail(listImageDetailResult);
+            var newGameDto = _mapper.Map<Game, GameDto>(newGame);
+            newGameDto.ImageGameDetail = listImageGameDto;
+            newGameDto.Genres = customMapper.CustomMappDetailGenre(listGenreDetailResult);
+
+            return Ok(new { newGameDto });
+        }
+        [Authorize(Roles = "admin")]
+        [HttpGet("check-version-exist/{idGame}/{version}")]
+        public IActionResult CheckVersionExist(string idGame, string version){
+            var existGame = _context.GameVersion.FirstOrDefault(g => g.IdGame == idGame && g.VersionGame == version);
+            if (existGame == null) return Ok(new {message = "no"});
+                else return Ok(new {message = "yes"});
+        }
 
         [HttpGet("more-like-this/{idGame}/{amount}")]
         public IActionResult GetGameMoreLikeThis(string idGame, int amount)
@@ -236,6 +310,75 @@ namespace game_store_be.Controllers
             }
 
             return NotFound();
+        }
+        [HttpGet("lazy-load/browse")]
+        public IActionResult GetGameBrowse([FromBody] LazyLoadBrowseBody param){
+            List<GameDto> gameBrowse = new List<GameDto>();
+            if (param.ListGenreDetail == null || param.ListGenreDetail.Count() == 0) {
+                var games = GetGameBrowse();
+                var listGameDto = _mapper.Map<IEnumerable<GameDto>>(games);
+                gameBrowse.AddRange(listGameDto);
+            } else {
+                foreach(var genreItem in param.ListGenreDetail){
+                var games = _context.Game
+                            .Include(x => x.IdDiscountNavigation)
+                            .Include(x => x.DetailGenre)
+                                .ThenInclude(x => x.IdGenreNavigation)
+                            .Include(x => x.ImageGameDetail)
+                            .Join(
+                                _context.DetailGenre,
+                                game => game.IdGame,
+                                detailGenre => detailGenre.IdGame,
+                                (game, detailGenre) => new { detailGenre,game }
+                            )
+                            .AsNoTracking()
+                            .Where(e => e.detailGenre.IdGenre == genreItem);
+
+                List<Game> listGame = new List<Game>();
+                foreach (var gamesItem in games) listGame.Add(gamesItem.game);
+                var listGameDto = _mapper.Map<IEnumerable<GameDto>>(listGame);
+                for (var i = 0; i < listGameDto.Count(); i++)
+                {
+                    listGameDto.ToList().ElementAt(i).Discount = _mapper.Map<Discount, DiscountDto>(listGame.ToList().ElementAt(i).IdDiscountNavigation);
+                    listGameDto.ToList().ElementAt(i).Genres = _mapper.Map<ICollection<DetailGenreDto>>(listGame.ToList().ElementAt(i).DetailGenre);
+                    listGameDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(listGame.ToList().ElementAt(i).ImageGameDetail.OrderBy(i => i.Url));
+                }
+                gameBrowse.AddRange(listGameDto);
+            }
+            }
+            switch (param.sortBy){
+                case "abc":
+                    gameBrowse = gameBrowse.OrderBy(e => e.NameGame).ToList();
+                    break;
+                case "new-release":
+                    gameBrowse = gameBrowse.OrderByDescending(e => e.ReleaseDate).ToList();
+                    break;
+                case "price-to-high":
+                    gameBrowse = gameBrowse.OrderBy(e => e.Cost).ToList();
+                    break;
+                case "price-to-low":
+                    gameBrowse = gameBrowse.OrderByDescending(e => e.Cost).ToList();
+                    break;
+            }
+            var result = gameBrowse.Skip(param.start).Take(param.count).ToList();
+            if (result != null) return Ok(result);
+            return NotFound("Out of data");
+        }
+        public IEnumerable<GameDto> GetGameBrowse()
+        {
+            var games = _context.Game
+                .Include(x => x.IdDiscountNavigation)
+                .Include(x => x.DetailGenre)
+                    .ThenInclude(x => x.IdGenreNavigation)
+                .Include(x => x.ImageGameDetail);
+            var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
+            for (var i = 0; i < games.Count(); i++)
+            {
+                gamesDto.ToList().ElementAt(i).Discount = _mapper.Map<Discount, DiscountDto>(games.ToList().ElementAt(i).IdDiscountNavigation);
+                gamesDto.ToList().ElementAt(i).Genres = _mapper.Map<ICollection<DetailGenreDto>>(games.ToList().ElementAt(i).DetailGenre);
+                gamesDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(games.ToList().ElementAt(i).ImageGameDetail.OrderBy(i => i.Url));
+            }
+            return gamesDto;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Net;
+using AutoMapper;
 using game_store_be.CustomModel;
 using game_store_be.Dtos;
 using game_store_be.Models;
@@ -17,6 +18,8 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using SmtpManager;
+using static Pirexcs.UserIC;
 
 namespace game_store_be.Controllers
 {
@@ -28,6 +31,7 @@ namespace game_store_be.Controllers
         private readonly game_storeContext _context;
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
+        private static Hashtable codeVerify = new Hashtable();
         public UserController(game_storeContext context, IMapper mapper, IConfiguration configuration)
         {
             _context = context;
@@ -61,7 +65,7 @@ namespace game_store_be.Controllers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var claims = new Claim[]
             {
-                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Name, user.UserName.ToLower()),
                 new Claim(ClaimTypes.NameIdentifier, user.IdUser),
                 new Claim(ClaimTypes.Role, user.Roles),
             };
@@ -111,13 +115,19 @@ namespace game_store_be.Controllers
         [HttpPost("register")]
         public IActionResult Register([FromBody] Users newUser)
         {
+            var existUser = _context.Users.FirstOrDefault(u => u.Email.ToLower() == newUser.Email.ToLower());
+            if (existUser != null) return NotFound("Email already register");
+            existUser = _context.Users.FirstOrDefault(u => u.UserName.ToLower() == newUser.UserName.ToLower());
+            if (existUser != null) return NotFound("Username already register");
+
             newUser.IdUser = Guid.NewGuid().ToString();
             newUser.Password = HassPassword(newUser.Password);
             newUser.Roles = "user";
-
+            newUser.Avatar = CreateAvatar(newUser.UserName);
+            newUser.ConfirmEmail = false;
             _context.Users.Add(newUser);
             _context.SaveChanges();
-            return Ok(newUser);
+            return Ok(new {message = "Register Sucessful !"});
         }
 
         [AllowAnonymous]
@@ -130,7 +140,8 @@ namespace game_store_be.Controllers
 
             if (lastToken == null || lastToken == "")
             {
-                var existUser = _context.Users.FirstOrDefault(u => u.Email == infoLogin.Email && u.Password == HassPassword(infoLogin.Password));
+                var existUser = _context.Users
+                    .FirstOrDefault(u => (u.Email.ToLower() == infoLogin.Email.ToLower() || u.UserName.ToLower() == infoLogin.Email.ToLower()) && u.Password == HassPassword(infoLogin.Password));
 
                 if (existUser == null)
                 {
@@ -163,5 +174,167 @@ namespace game_store_be.Controllers
             _context.SaveChanges();
             return Ok(newUser);
         }
+
+        [AllowAnonymous]
+        [HttpPost("login-sma")]
+        public IActionResult LoginWithSMA([FromBody] LoginWithSMA infoLogin)
+        {
+            var existUser = _context.Users
+                            .FirstOrDefault(u => u.Email.ToLower() == infoLogin.ILogin.Email.ToLower());
+            
+            if (existUser == null)
+            {
+                return Ok(CreateResLoginSuccess(RegisterAccountSMA(infoLogin.IUser)));
+            }
+
+            return Ok(CreateResLoginSuccess(existUser));
+        }
+
+        public Users RegisterAccountSMA(Users newUser)
+        {
+            newUser.IdUser = Guid.NewGuid().ToString();
+            newUser.Password = null;
+            newUser.Roles = "user";
+            var username ="";
+            while (true){
+                username = CreateUsername(newUser.RealName);
+                var existUsername = _context.Users.FirstOrDefault(u => u.UserName.ToLower() == username.ToLower());
+                if (existUsername == null) break;
+            }
+            
+            newUser.UserName = username;
+            newUser.Avatar = CreateAvatar(username);
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+            return newUser;
+        }
+        [AllowAnonymous]
+        [HttpGet("check-valid-email/{email}")]
+        public IActionResult CheckValidEmail(string email){
+            var existUsername = _context.Users.FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
+            if (existUsername == null) {
+                return Ok("valid");
+            } else {
+                return NotFound("Email already register");
+            }              
+        }
+        [AllowAnonymous]
+        [HttpGet("check-valid-username/{username}")]
+        public IActionResult CheckValidUsername(string username){
+            var existUsername = _context.Users.FirstOrDefault(u => u.UserName.ToLower() == username.ToLower());
+            if (existUsername == null) {
+                return Ok("valid");
+            } else {
+                return NotFound("Stun ID already exist");
+            }              
+        }
+
+        [HttpPost("change-password")]
+        public IActionResult ChangePassword(){
+            string idUser = HttpContext.Request.Headers["idUser"];
+            string pwd = HttpContext.Request.Headers["pwd"];
+
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
+
+            if (existUser == null) {
+                return NotFound("User not exists");
+            }
+            existUser.Password = HassPassword(pwd);
+            _context.SaveChanges();
+            return Ok("Change password sucessful !");
+        }
+
+        [HttpPut("change-info/{idUser}")]
+        public IActionResult ChangeInfo(string idUser,[FromBody] Users infoUser){
+            
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
+
+            if (existUser == null) {
+                return NotFound("User not exists");
+            }
+            if (infoUser.Avatar != null) existUser.Avatar = infoUser.Avatar;
+            if (infoUser.RealName != null) existUser.RealName = infoUser.RealName;
+            if (infoUser.Background != null) existUser.Background = infoUser.Background;
+            _context.SaveChanges(); 
+            var userDto = _mapper.Map<Users, UserDto>(existUser);
+            return Ok(userDto);
+        }
+        [AllowAnonymous]
+        [HttpPost("send-mail-reset-pwd")]
+        public IActionResult SendMailResetPwd(){
+            string email = HttpContext.Request.Headers["email"];
+            email = email.ToLower();
+            var existUser = _context.Users.FirstOrDefault(u => u.Email.ToLower() == email);
+            if (existUser == null) return NotFound("Email is not registered");
+            var rand = new Random();
+            string code = rand.Next(111111,988888).ToString();
+            codeVerify[email] = code;
+            bool result = SmtpController.CreateResetPasswordVerify(existUser.Email,code,existUser.IdUser);
+            return Ok(new {message = result});
+        }
+        [AllowAnonymous]
+        [HttpPost("send-mail-confirm-account")]
+        public IActionResult SendMailConfirmAccount(){
+            string email = HttpContext.Request.Headers["email"];
+            email = email.ToLower();
+            var existUser = _context.Users.FirstOrDefault(u => u.Email.ToLower() == email);
+            if (existUser == null) return NotFound("Email is not registered");
+            var rand = new Random();
+            string code = rand.Next(111111,988888).ToString();
+            codeVerify[email] = code;
+            bool result = SmtpController.CreateEmailVerify(email, code, existUser.IdUser);
+            return Ok(result);
+        }
+        [AllowAnonymous]
+        [HttpPost("verification/code")]
+        public IActionResult CodeVerify([FromBody] Verification info){
+            info.Email = info.Email.ToLower();
+            var existUser = _context.Users.FirstOrDefault(u => u.Email.ToLower() == info.Email);
+            if (existUser == null) return NotFound("User not exists");
+            if (codeVerify[info.Email]==null){
+                return NotFound("Fail to verification");
+            } else {
+                var result = codeVerify[info.Email].ToString()==info.Code ? true : false;
+                if (result) {
+                    codeVerify.Remove(info.Email);
+                    existUser.ConfirmEmail = true;
+                    _context.SaveChanges();
+                    return Ok(CreateResLoginSuccess(existUser));
+                }
+                return NotFound("Code Wrong, Try Again");
+            }
+        }
+        [AllowAnonymous]
+        [HttpPost("verification/link")]
+        public IActionResult LinkVerify(){
+            string url = HttpContext.Request.Headers["url"];
+            string code = "";
+            int j = 1;
+            for (int i=0; i<6; i++) {
+                code += (char)(url[j]-49);
+                j+= 3;
+            }
+            j = 1;
+            for (int i=0; i<6; i++) {
+                url = url.Remove(j,1);
+                j+=2;
+            }
+            Console.WriteLine(url);
+                  Console.WriteLine(code);
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == url);
+            if (existUser == null) return NotFound(new {message = "User not exists"});
+            if (codeVerify[existUser.Email]==null){
+                return NotFound("Fail to verification");
+            } 
+            var result = codeVerify[existUser.Email].ToString() == code ? true : false;
+            if (result){
+                codeVerify.Remove(existUser.Email);
+                existUser.ConfirmEmail = true;
+                _context.SaveChanges();
+                return Ok(CreateResLoginSuccess(existUser));
+            }
+            return NotFound("Fail to verification");
+        }
+        
     }
 }

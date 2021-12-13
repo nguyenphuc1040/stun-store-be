@@ -1,13 +1,15 @@
 using AutoMapper;
+using game_store_be.CustomModel;
+using game_store_be.Dtos;
 using game_store_be.Models;
+using game_store_be.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using System.Text.Json;
 
 namespace game_store_be.Controllers
 {
@@ -54,6 +56,33 @@ namespace game_store_be.Controllers
             _mapper.Map(updateSuggestion, existSuggestion);
             _context.SaveChanges();
             return Ok(existSuggestion);
+        }
+        [AllowAnonymous]
+        [HttpGet("get-game/{title}")]
+        public IActionResult GetGameSuggestion(string title){
+            var existSuggestion = _context.Suggestion
+                .FirstOrDefault(sg => sg.Title == title);
+            string[] listGameStr = JsonSerializer.Deserialize<string[]>(existSuggestion.Value);
+            List<GameDto> listGame = new List<GameDto>();
+            foreach (string item in listGameStr) {
+                var game = GetGameById(item);
+                if (game!=null) listGame.Add(game);
+            }
+            return Ok(listGame);
+        }
+        public GameDto GetGameById(string idGame)
+        {
+            var existGame = _context.Game.Where(u => u.IdGame == idGame)
+                    .Include(u => u.IdDiscountNavigation)
+                    .Include(x => x.DetailGenre)
+                        .ThenInclude(x => x.IdGenreNavigation)
+                    .Include(x => x.ImageGameDetail);
+            var existGameDto = _mapper.Map<Game,GameDto>(existGame.First());
+            existGameDto.Discount = _mapper.Map<Discount, DiscountDto>(existGame.First().IdDiscountNavigation);
+            existGameDto.Genres = _mapper.Map<ICollection<DetailGenreDto>>(existGame.First().DetailGenre);
+            existGameDto.ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(existGame.First().ImageGameDetail.OrderBy(i=>i.Url));
+            
+            return existGameDto;
         }
     }
 }

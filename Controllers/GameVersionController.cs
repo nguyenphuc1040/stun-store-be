@@ -80,11 +80,12 @@ namespace game_store_be.Controllers
 
             return Ok(existGameDto);
         }
-        [HttpGet("by-game/{idGame}/{lastestVersion}")]
-        public IActionResult GetNewVersionByIdGameAndLastestVersion(string idGame, string lastestVersion)
+        [HttpGet("by-game/lastest-version/{idGame}")]
+        public IActionResult GetNewVersionByIdGameAndLastestVersion(string idGame)
         {
             var customMapper = new CustomMapper(_mapper);
-
+            var lastestVersion = _context.Game
+                                    .FirstOrDefault(g => g.IdGame == idGame).LastestVersion;
             var existGame = _context.Game
                             .Include(g => g.IdDiscountNavigation)
                             .Include(g => g.DetailGenre)
@@ -124,5 +125,6 @@ namespace game_store_be.Controllers
 
             return NotFound(new { message = "Not found game version" });
         }
+
     }
 }

@@ -14,5 +14,7 @@ namespace game_store_be.Dtos
         public string NumberPhone { get; set; }
         public string Avatar { get; set; }
         public string Background { get; set; }
+        public string Roles { get; set; }
+        public bool ConfirmEmail { get; set; }
     }
 }

@@ -14,4 +14,13 @@ namespace game_store_be.CustomModel
         public List<string>? ListImageDetail { get; set; }
         public List<string>? ListGenreDetail { get; set; }
     }
+
+    public class LazyLoadBrowseBody
+    {
+        public List<string>? ListGenreDetail { get; set; }
+        public int count { get; set; }
+        public int start { get; set; }
+        public string sortBy { get; set; }
+    }
+
 }
