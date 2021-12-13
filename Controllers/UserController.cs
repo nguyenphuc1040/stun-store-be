@@ -335,6 +335,13 @@ namespace game_store_be.Controllers
             }
             return NotFound("Fail to verification");
         }
+        [AllowAnonymous]
+        [HttpGet("verification-email-status/{idUser}")]
+        public IActionResult GetVerificationEmailStatus(string idUser){
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
+            if (existUser == null) return NotFound("Not found user");
+            return Ok(existUser.ConfirmEmail);
+        }
         
     }
 }
