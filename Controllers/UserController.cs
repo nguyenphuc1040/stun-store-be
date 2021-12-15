@@ -195,6 +195,7 @@ namespace game_store_be.Controllers
             newUser.IdUser = Guid.NewGuid().ToString();
             newUser.Password = null;
             newUser.Roles = "user";
+            newUser.ConfirmEmail = true;
             var username ="";
             while (true){
                 username = CreateUsername(newUser.RealName);
@@ -334,6 +335,13 @@ namespace game_store_be.Controllers
                 return Ok(CreateResLoginSuccess(existUser));
             }
             return NotFound("Fail to verification");
+        }
+        [AllowAnonymous]
+        [HttpGet("verification-email-status/{idUser}")]
+        public IActionResult GetVerificationEmailStatus(string idUser){
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
+            if (existUser == null) return NotFound("Not found user");
+            return Ok(existUser.ConfirmEmail);
         }
         
     }
