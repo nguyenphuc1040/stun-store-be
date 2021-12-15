@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Collections;
+using AutoMapper;
 using game_store_be.CustomModel;
 using game_store_be.Dtos;
 using game_store_be.Models;
@@ -18,7 +19,6 @@ namespace game_store_be.Controllers
     {
         private readonly game_storeContext _context;
         private readonly IMapper _mapper;
-
         public GameController(game_storeContext context, IMapper mapper)
         {
             _context = context;
@@ -153,6 +153,10 @@ namespace game_store_be.Controllers
             if (existGame == null) return NotFound(new { message = "Game not found" });
             newGame.Plaform = existGame.Plaform;
             newGame.Cost = existGame.Cost;
+            newGame.ReleaseDate = existGame.ReleaseDate;
+            newGame.NumberOfBuyer = existGame.NumberOfBuyer;
+            newGame.NumberOfDownloaders = existGame.NumberOfDownloaders;
+            newGame.IdDiscount = existGame.IdDiscount;
             _mapper.Map(newGame, existGame);
 
             // remove old images
@@ -215,11 +219,10 @@ namespace game_store_be.Controllers
             var existGame = GetGameByIdService(idGame);
 
             if (existGame == null) return NotFound(new { message = "Game not found" });
-            // existGame.NameGame = newGame.NameGame;
-            // existGame.Developer = newGame.Developer;
-            // existGame.Publisher = newGame.Publisher;
-            // existGame.urlVideo = newGame.urlVideo;
-            _mapper.Map(newGame, existGame);
+            existGame.NameGame = newGame.NameGame;
+            existGame.Developer = newGame.Developer;
+            existGame.Publisher = newGame.Publisher;
+            existGame.UrlVideo = newGame.UrlVideo;
 
             // remove old images
             var existImageDetails = _context.ImageGameDetail.Where(imgD => imgD.IdGame == idGame);
@@ -319,32 +322,37 @@ namespace game_store_be.Controllers
                 var listGameDto = _mapper.Map<IEnumerable<GameDto>>(games);
                 gameBrowse.AddRange(listGameDto);
             } else {
+                Hashtable checkSame = new Hashtable();
                 foreach(var genreItem in param.ListGenreDetail){
-                var games = _context.Game
-                            .Include(x => x.IdDiscountNavigation)
-                            .Include(x => x.DetailGenre)
-                                .ThenInclude(x => x.IdGenreNavigation)
-                            .Include(x => x.ImageGameDetail)
-                            .Join(
-                                _context.DetailGenre,
-                                game => game.IdGame,
-                                detailGenre => detailGenre.IdGame,
-                                (game, detailGenre) => new { detailGenre,game }
-                            )
-                            .AsNoTracking()
-                            .Where(e => e.detailGenre.IdGenre == genreItem);
+                    var games = _context.Game
+                                .Include(x => x.IdDiscountNavigation)
+                                .Include(x => x.DetailGenre)
+                                    .ThenInclude(x => x.IdGenreNavigation)
+                                .Include(x => x.ImageGameDetail)
+                                .Join(
+                                    _context.DetailGenre,
+                                    game => game.IdGame,
+                                    detailGenre => detailGenre.IdGame,
+                                    (game, detailGenre) => new { detailGenre,game }
+                                )
+                                .AsNoTracking()
+                                .Where(g => g.detailGenre.IdGenre == genreItem);
 
-                List<Game> listGame = new List<Game>();
-                foreach (var gamesItem in games) listGame.Add(gamesItem.game);
-                var listGameDto = _mapper.Map<IEnumerable<GameDto>>(listGame);
-                for (var i = 0; i < listGameDto.Count(); i++)
-                {
-                    listGameDto.ToList().ElementAt(i).Discount = _mapper.Map<Discount, DiscountDto>(listGame.ToList().ElementAt(i).IdDiscountNavigation);
-                    listGameDto.ToList().ElementAt(i).Genres = _mapper.Map<ICollection<DetailGenreDto>>(listGame.ToList().ElementAt(i).DetailGenre);
-                    listGameDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(listGame.ToList().ElementAt(i).ImageGameDetail.OrderBy(i => i.Url));
+                    List<Game> listGame = new List<Game>();
+                    foreach (var gamesItem in games) listGame.Add(gamesItem.game);
+                    var listGameDto = _mapper.Map<IEnumerable<GameDto>>(listGame);
+                    for (var i = 0; i < listGameDto.Count(); i++)
+                    {
+                        listGameDto.ToList().ElementAt(i).Discount = _mapper.Map<Discount, DiscountDto>(listGame.ToList().ElementAt(i).IdDiscountNavigation);
+                        listGameDto.ToList().ElementAt(i).Genres = _mapper.Map<ICollection<DetailGenreDto>>(listGame.ToList().ElementAt(i).DetailGenre);
+                        listGameDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(listGame.ToList().ElementAt(i).ImageGameDetail.OrderBy(i => i.Url));
+                    }
+                    foreach(var item in listGameDto) 
+                        if (checkSame[item.IdGame] == null) {
+                            checkSame.Add(item.IdGame,true);
+                            gameBrowse.Add(item);
+                        }
                 }
-                gameBrowse.AddRange(listGameDto);
-            }
             }
             switch (param.sortBy){
                 case "abc":
@@ -360,6 +368,7 @@ namespace game_store_be.Controllers
                     gameBrowse = gameBrowse.OrderByDescending(e => e.Cost).ToList();
                     break;
             }
+
             var result = gameBrowse.Skip(param.start).Take(param.count).ToList();
             if (result != null) return Ok(result);
             return NotFound("Out of data");

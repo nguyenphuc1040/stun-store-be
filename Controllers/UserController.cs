@@ -195,6 +195,7 @@ namespace game_store_be.Controllers
             newUser.IdUser = Guid.NewGuid().ToString();
             newUser.Password = null;
             newUser.Roles = "user";
+            newUser.ConfirmEmail = true;
             var username ="";
             while (true){
                 username = CreateUsername(newUser.RealName);

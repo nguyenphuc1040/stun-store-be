@@ -31,7 +31,7 @@ namespace game_store_be.Controllers
         {
             return Ok(_context.Suggestion.ToList());
         }
-
+        [AllowAnonymous]
         [HttpPost("create")]
         public IActionResult CreateNewSuggestion([FromBody] Suggestion newSuggestion)
         {
@@ -58,8 +58,8 @@ namespace game_store_be.Controllers
             return Ok(existSuggestion);
         }
         [AllowAnonymous]
-        [HttpGet("get-game/{title}")]
-        public IActionResult GetGameSuggestion(string title){
+        [HttpGet("get-game/{title}/{count}/{start}")]
+        public IActionResult GetGameSuggestion(string title, int count, int start){
             var existSuggestion = _context.Suggestion
                 .FirstOrDefault(sg => sg.Title == title);
             string[] listGameStr = JsonSerializer.Deserialize<string[]>(existSuggestion.Value);
@@ -68,7 +68,7 @@ namespace game_store_be.Controllers
                 var game = GetGameById(item);
                 if (game!=null) listGame.Add(game);
             }
-            return Ok(listGame);
+            return Ok(listGame.Skip(start).Take(count));
         }
         public GameDto GetGameById(string idGame)
         {
