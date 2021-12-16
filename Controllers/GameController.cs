@@ -314,11 +314,18 @@ namespace game_store_be.Controllers
 
             return NotFound();
         }
-        [HttpGet("lazy-load/browse")]
+        [HttpGet("get-game-for-discount")]
+        public IActionResult GetGameForDiscount(){
+            var listGame = _context.Game
+                            .Where(g => g.IdDiscount == null && g.Cost != 0)
+                            .ToList();
+            return Ok(listGame);
+        }
+        [HttpPost("lazy-load/browse")]
         public IActionResult GetGameBrowse([FromBody] LazyLoadBrowseBody param){
             List<GameDto> gameBrowse = new List<GameDto>();
             if (param.ListGenreDetail == null || param.ListGenreDetail.Count() == 0) {
-                var games = GetGameBrowse();
+                var games = GetGameBrowseAll(param);
                 var listGameDto = _mapper.Map<IEnumerable<GameDto>>(games);
                 gameBrowse.AddRange(listGameDto);
             } else {
@@ -336,7 +343,8 @@ namespace game_store_be.Controllers
                                     (game, detailGenre) => new { detailGenre,game }
                                 )
                                 .AsNoTracking()
-                                .Where(g => g.detailGenre.IdGenre == genreItem);
+                                .Where(g => g.detailGenre.IdGenre == genreItem)
+                                .Skip(param.start).Take(param.count);
 
                     List<Game> listGame = new List<Game>();
                     foreach (var gamesItem in games) listGame.Add(gamesItem.game);
@@ -368,18 +376,17 @@ namespace game_store_be.Controllers
                     gameBrowse = gameBrowse.OrderByDescending(e => e.Cost).ToList();
                     break;
             }
-
-            var result = gameBrowse.Skip(param.start).Take(param.count).ToList();
-            if (result != null) return Ok(result);
+            if (gameBrowse != null) return Ok(gameBrowse);
             return NotFound("Out of data");
         }
-        public IEnumerable<GameDto> GetGameBrowse()
+        public IEnumerable<GameDto> GetGameBrowseAll(LazyLoadBrowseBody param)
         {
             var games = _context.Game
                 .Include(x => x.IdDiscountNavigation)
                 .Include(x => x.DetailGenre)
                     .ThenInclude(x => x.IdGenreNavigation)
-                .Include(x => x.ImageGameDetail);
+                .Include(x => x.ImageGameDetail)
+                .Skip(param.start).Take(param.count).ToList();
             var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
             for (var i = 0; i < games.Count(); i++)
             {

@@ -64,10 +64,15 @@ namespace game_store_be.Controllers
                 .FirstOrDefault(sg => sg.Title == title);
             string[] listGameStr = JsonSerializer.Deserialize<string[]>(existSuggestion.Value);
             List<GameDto> listGame = new List<GameDto>();
-            foreach (string item in listGameStr) {
-                var game = GetGameById(item);
+            for (int i=start; i<start+count; i++) {
+                if (i>listGameStr.Length -1) break;
+                var game = GetGameById(listGameStr[i]);
                 if (game!=null) listGame.Add(game);
             }
+            // foreach (string item in listGameStr) {
+            //     var game = GetGameById(item);
+            //     if (game!=null) listGame.Add(game);
+            // }
             return Ok(listGame.Skip(start).Take(count));
         }
         public GameDto GetGameById(string idGame)
