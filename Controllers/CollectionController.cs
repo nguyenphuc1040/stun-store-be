@@ -45,5 +45,16 @@ namespace game_store_be.Controllers
             var userDto = _mapper.Map<Users, UserDto>(user);
             return Ok(new { user = userDto, listGame = collectionsDto });
         }
+        [AllowAnonymous]
+        [HttpGet("is-own-by-user/{idUser}/{idGame}")]
+        public IActionResult GetIsOwnByUser(string idUser, string idGame){
+            var existGame = _context.Collection
+                            .FirstOrDefault(c => c.IdGame == idGame && c.IdUser == idUser);
+            if (existGame == null) return NotFound("not found");
+            var existBill= _context.Bill
+                            .Where(b => b.IdUser == idUser && b.IdGame == idGame && b.Actions == "pay")
+                            .OrderByDescending(b => b.DatePay).FirstOrDefault();
+            return Ok(existBill);
+        }
     }
 }
