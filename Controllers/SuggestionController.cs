@@ -62,17 +62,14 @@ namespace game_store_be.Controllers
         public IActionResult GetGameSuggestion(string title, int count, int start){
             var existSuggestion = _context.Suggestion
                 .FirstOrDefault(sg => sg.Title == title);
-            string[] listGameStr = JsonSerializer.Deserialize<string[]>(existSuggestion.Value);
+            string[] listGameStr = existSuggestion.Value.Split(",");
+
             List<GameDto> listGame = new List<GameDto>();
             for (int i=start; i<start+count; i++) {
                 if (i>listGameStr.Length -1) break;
                 var game = GetGameById(listGameStr[i]);
                 if (game!=null) listGame.Add(game);
             }
-            // foreach (string item in listGameStr) {
-            //     var game = GetGameById(item);
-            //     if (game!=null) listGame.Add(game);
-            // }
             return Ok(listGame.Skip(start).Take(count));
         }
         public GameDto GetGameById(string idGame)
@@ -82,6 +79,7 @@ namespace game_store_be.Controllers
                     .Include(x => x.DetailGenre)
                         .ThenInclude(x => x.IdGenreNavigation)
                     .Include(x => x.ImageGameDetail);
+            if (existGame == null) return null;
             var existGameDto = _mapper.Map<Game,GameDto>(existGame.First());
             existGameDto.Discount = _mapper.Map<Discount, DiscountDto>(existGame.First().IdDiscountNavigation);
             existGameDto.Genres = _mapper.Map<ICollection<DetailGenreDto>>(existGame.First().DetailGenre);

@@ -78,6 +78,8 @@ namespace game_store_be.Controllers
             newGameVersion.IdGameVersion = Guid.NewGuid().ToString();
             newGameVersion.DateUpdate = DateTime.UtcNow;
             newGame.ReleaseDate = DateTime.UtcNow;
+            newGame.NumOfRate = 0;
+            newGame.AverageRate = 0;
 
             var listImageGameDetail = new List<ImageGameDetail>();
             if (listImageDetail != null)

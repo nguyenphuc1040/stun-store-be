@@ -69,5 +69,13 @@ namespace game_store_be.Controllers
             _context.SaveChanges();
             return Ok(new { message = "Delete Success" });
         }
+        [HttpGet("check-is-wishlist/{idUser}/{idGame}")]
+        public IActionResult CheckIsWishList(string idUser, string idGame){
+            var existWishList = ExistWishList(idGame, idUser);
+            if (existWishList == null) {
+                return NotFound("not found");
+            }
+            return Ok("found");
+        }
     }
 }
