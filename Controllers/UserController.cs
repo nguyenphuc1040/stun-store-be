@@ -230,8 +230,8 @@ namespace game_store_be.Controllers
             }              
         }
 
-        [HttpPost("change-password")]
-        public IActionResult ChangePassword(){
+        [HttpPost("reset-password")]
+        public IActionResult ResetPassword(){
             string idUser = HttpContext.Request.Headers["idUser"];
             string pwd = HttpContext.Request.Headers["pwd"];
 
@@ -241,6 +241,17 @@ namespace game_store_be.Controllers
                 return NotFound("User not exists");
             }
             existUser.Password = HassPassword(pwd);
+            _context.SaveChanges();
+            return Ok("Change password sucessful !");
+        }
+        [HttpPost("change-password")]
+        public IActionResult ChangePassword([FromBody] ChangePassBody pwd){
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == pwd.IdUser);
+            if (existUser == null) {
+                return NotFound("User not exists");
+            }
+            if (existUser.Password != HassPassword(pwd.CurrentPass)) return NotFound("Wrong current password");
+            existUser.Password = HassPassword(pwd.NewPass);
             _context.SaveChanges();
             return Ok("Change password sucessful !");
         }

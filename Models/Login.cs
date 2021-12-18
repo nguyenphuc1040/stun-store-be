@@ -21,4 +21,9 @@ namespace game_store_be.Models
         public string Email { get; set; }
         public string Code { get; set; }
     }
+    public class ChangePassBody {
+        public string IdUser { get; set; }
+        public string CurrentPass { get; set; }
+        public string NewPass { get; set; }
+    }
 }
