@@ -45,7 +45,8 @@ namespace game_store_be.Controllers
                     .ThenInclude(g => g.IdDiscountNavigation)
                 .Include(c => c.IdGameNavigation)
                     .ThenInclude(g => g.DetailGenre).ThenInclude(g => g.IdGenreNavigation)
-                .Include(c => c.IdGameNavigation).ThenInclude(g => g.ImageGameDetail);
+                .Include(c => c.IdGameNavigation).ThenInclude(g => g.ImageGameDetail)
+                .Skip(start).Take(count);
             
             var wishListDto = customMapper.CustomMapWishList(wishlist.ToList());
 
