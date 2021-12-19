@@ -159,6 +159,8 @@ namespace game_store_be.Controllers
             newGame.NumberOfBuyer = existGame.NumberOfBuyer;
             newGame.NumberOfDownloaders = existGame.NumberOfDownloaders;
             newGame.IdDiscount = existGame.IdDiscount;
+            newGame.NumOfRate = existGame.NumOfRate;
+            newGame.AverageRate = existGame.AverageRate;
             _mapper.Map(newGame, existGame);
 
             // remove old images

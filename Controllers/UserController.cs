@@ -255,7 +255,13 @@ namespace game_store_be.Controllers
             _context.SaveChanges();
             return Ok("Change password sucessful !");
         }
-
+        [HttpGet("check-sma-account/{idUser}")]
+        public IActionResult CheckSmaAccount(string idUser){
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
+            if (existUser == null) return NotFound("not found user");
+            if (existUser.Password == null) return Ok("true");
+            return Ok("false");
+        }
         [HttpPut("change-info/{idUser}")]
         public IActionResult ChangeInfo(string idUser,[FromBody] Users infoUser){
             
@@ -267,6 +273,8 @@ namespace game_store_be.Controllers
             if (infoUser.Avatar != null) existUser.Avatar = infoUser.Avatar;
             if (infoUser.RealName != null) existUser.RealName = infoUser.RealName;
             if (infoUser.Background != null) existUser.Background = infoUser.Background;
+            if (infoUser.UserName != null) existUser.UserName = infoUser.UserName;
+            if (infoUser.NumberPhone != null) existUser.NumberPhone = infoUser.NumberPhone;
             _context.SaveChanges(); 
             var userDto = _mapper.Map<Users, UserDto>(existUser);
             return Ok(userDto);

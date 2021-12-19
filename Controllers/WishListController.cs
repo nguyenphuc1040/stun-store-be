@@ -35,30 +35,31 @@ namespace game_store_be.Controllers
             return (_context.WishList.FirstOrDefault(u => u.IdGame == idGame && u.IdUser == idUser));
         }
 
-        [HttpGet("{idUser}")]
-        public IActionResult getWishListByIdUser(string idUser)
+        [HttpGet("{idUser}/{start}/{count}")]
+        public IActionResult getWishListByIdUser(string idUser, int start, int count)
         {
             var customMapper = new CustomMapper(_mapper);
             var wishlist = _context.WishList
                 .Include(wl => wl.IdGameNavigation)
-                    .ThenInclude(l => l.ImageGameDetail);
+                    .ThenInclude(l => l.ImageGameDetail).Skip(start).Take(count);
 
             var wishListDto = customMapper.CustomMapWishList(wishlist.ToList());
 
             return Ok(wishListDto);
         }
 
-        [HttpPost("create/{idUser}")]
-        public IActionResult CreateWishListByIdUser(string idUser, [FromBody] string idGame)
+        [HttpPost("create/{idUser}/{idGame}")]
+        public IActionResult CreateWishListByIdUser(string idUser,string idGame)
         {
+            Console.WriteLine(idUser+ " "+idGame);
             var newWishtList = new WishList{ IdGame = idGame, IdUser = idUser };
             _context.WishList.Add(newWishtList);
             _context.SaveChanges();
-            return Ok(newWishtList);
+            return Ok("created");
         }
 
-        [HttpDelete("delete/{idUser}")]
-        public IActionResult DeleteWishListByIdUser(string idUser, [FromBody] string idGame)
+        [HttpDelete("delete/{idUser}/{idGame}")]
+        public IActionResult DeleteWishListByIdUser(string idUser, string idGame)
         {
             var existWishList = ExistWishList(idGame, idUser);
             if (existWishList == null)
@@ -67,13 +68,14 @@ namespace game_store_be.Controllers
             }
             _context.WishList.Remove(existWishList);
             _context.SaveChanges();
-            return Ok(new { message = "Delete Success" });
+            return Ok("deleted");
         }
+        [AllowAnonymous]
         [HttpGet("check-is-wishlist/{idUser}/{idGame}")]
         public IActionResult CheckIsWishList(string idUser, string idGame){
             var existWishList = ExistWishList(idGame, idUser);
             if (existWishList == null) {
-                return NotFound("not found");
+                return Ok("not found");
             }
             return Ok("found");
         }
