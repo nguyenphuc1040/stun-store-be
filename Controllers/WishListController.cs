@@ -40,9 +40,13 @@ namespace game_store_be.Controllers
         {
             var customMapper = new CustomMapper(_mapper);
             var wishlist = _context.WishList
-                .Include(wl => wl.IdGameNavigation)
-                    .ThenInclude(l => l.ImageGameDetail).Skip(start).Take(count);
-
+                .Where(c => c.IdUser == idUser)
+                .Include(c => c.IdGameNavigation)
+                    .ThenInclude(g => g.IdDiscountNavigation)
+                .Include(c => c.IdGameNavigation)
+                    .ThenInclude(g => g.DetailGenre).ThenInclude(g => g.IdGenreNavigation)
+                .Include(c => c.IdGameNavigation).ThenInclude(g => g.ImageGameDetail);
+            
             var wishListDto = customMapper.CustomMapWishList(wishlist.ToList());
 
             return Ok(wishListDto);
@@ -51,7 +55,6 @@ namespace game_store_be.Controllers
         [HttpPost("create/{idUser}/{idGame}")]
         public IActionResult CreateWishListByIdUser(string idUser,string idGame)
         {
-            Console.WriteLine(idUser+ " "+idGame);
             var newWishtList = new WishList{ IdGame = idGame, IdUser = idUser };
             _context.WishList.Add(newWishtList);
             _context.SaveChanges();

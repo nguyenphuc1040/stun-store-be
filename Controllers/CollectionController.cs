@@ -35,8 +35,11 @@ namespace game_store_be.Controllers
             var collection = _context.Collection
                 .Where(c => c.IdUser == idUser)
                 .Include(c => c.IdGameNavigation)
+                    .ThenInclude(g => g.IdDiscountNavigation)
+                .Include(c => c.IdGameNavigation)
                     .ThenInclude(g => g.DetailGenre).ThenInclude(g => g.IdGenreNavigation)
                 .Include(c => c.IdGameNavigation).ThenInclude(g => g.ImageGameDetail);
+
             if (collection == null )
             {
                 return NotFound(new { message = "Not found" });
