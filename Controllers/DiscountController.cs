@@ -142,5 +142,20 @@ namespace game_store_be.Controllers
             var existGame = _context.Game.Where(g => g.IdDiscount == idDiscount).ToList();
             return Ok(existGame);
         }
+        [AllowAnonymous]
+        [HttpDelete("delete/outdate/{idDiscount}")]
+        public IActionResult DeleteDiscountOutDate(string idDiscount){
+            var existDiscount = _context.Discount.FirstOrDefault(d => d.IdDiscount == idDiscount);
+            if (existDiscount == null) return Ok();
+            int isOutDate = DateTime.Compare(existDiscount.EndDate,DateTime.Now);
+            if (isOutDate <= 0) return Ok();
+
+            var listGameDiscount = _context.Game.Where(g => g.IdDiscount == idDiscount).ToList();
+            foreach (var game in listGameDiscount) {
+                game.IdDiscount = null;
+            }
+            _context.SaveChanges();
+            return Ok();
+        }
     }
 }

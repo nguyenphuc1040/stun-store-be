@@ -85,16 +85,34 @@ namespace game_store_be.Controllers
             return tokenHandler.WriteToken(token);
         }
 
-        public Users ExistUser(string idUser)
+        private Users ExistUser(string idUser)
         {
             var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
             return existUser;
         }
-
-        [HttpGet]
-        public IActionResult GetAllUser()
+        private Users RegisterAccountSMA(Users newUser)
         {
-            var users = _context.Users.ToList();
+            newUser.IdUser = Guid.NewGuid().ToString();
+            newUser.Password = null;
+            newUser.Roles = "user";
+            newUser.ConfirmEmail = true;
+            var username ="";
+            while (true){
+                username = CreateUsername(newUser.RealName);
+                var existUsername = _context.Users.FirstOrDefault(u => u.UserName.ToLower() == username.ToLower());
+                if (existUsername == null) break;
+            }
+            
+            newUser.UserName = username;
+            newUser.Avatar = CreateAvatar(username);
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+            return newUser;
+        }
+        [HttpGet("{start}/{count}")]
+        public IActionResult GetAllUser(int start, int count)
+        {
+            var users = _context.Users.Skip(start).Take(count).ToList();
             var userDto = _mapper.Map<IEnumerable<UserDto>>(users);
             return Ok(userDto);
         }
@@ -190,25 +208,7 @@ namespace game_store_be.Controllers
             return Ok(CreateResLoginSuccess(existUser));
         }
 
-        public Users RegisterAccountSMA(Users newUser)
-        {
-            newUser.IdUser = Guid.NewGuid().ToString();
-            newUser.Password = null;
-            newUser.Roles = "user";
-            newUser.ConfirmEmail = true;
-            var username ="";
-            while (true){
-                username = CreateUsername(newUser.RealName);
-                var existUsername = _context.Users.FirstOrDefault(u => u.UserName.ToLower() == username.ToLower());
-                if (existUsername == null) break;
-            }
-            
-            newUser.UserName = username;
-            newUser.Avatar = CreateAvatar(username);
-            _context.Users.Add(newUser);
-            _context.SaveChanges();
-            return newUser;
-        }
+
         [AllowAnonymous]
         [HttpGet("check-valid-email/{email}")]
         public IActionResult CheckValidEmail(string email){

@@ -72,7 +72,7 @@ namespace game_store_be.Controllers
             }
             return Ok(listGame.Skip(start).Take(count));
         }
-        public GameDto GetGameById(string idGame)
+        private GameDto GetGameById(string idGame)
         {
             var existGame = _context.Game.Where(u => u.IdGame == idGame)
                     .Include(u => u.IdDiscountNavigation)
@@ -86,6 +86,17 @@ namespace game_store_be.Controllers
             existGameDto.ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(existGame.First().ImageGameDetail.OrderBy(i=>i.Url));
             
             return existGameDto;
+        }
+        [AllowAnonymous]
+        [HttpGet("get-game-suggestion-now")]
+        public IActionResult GetGameSuggestionNotification(){
+            var existGame = _context.Game.Where(g => g.IdDiscount != null).ToList();
+            var length = existGame.Count();
+            Random r = new Random();
+            var game = existGame[r.Next(0,length)];
+            var gameDto = GetGameById(game.IdGame);
+            if (gameDto == null) return NotFound();
+            return Ok(gameDto);
         }
     }
 }

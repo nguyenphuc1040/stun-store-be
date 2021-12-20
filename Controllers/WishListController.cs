@@ -56,6 +56,8 @@ namespace game_store_be.Controllers
         [HttpPost("create/{idUser}/{idGame}")]
         public IActionResult CreateWishListByIdUser(string idUser,string idGame)
         {
+            var existWishList = _context.WishList.FirstOrDefault(w => w.IdUser == idUser && w.IdGame == idGame);
+            if (existWishList != null) return Ok();
             var newWishtList = new WishList{ IdGame = idGame, IdUser = idUser };
             _context.WishList.Add(newWishtList);
             _context.SaveChanges();

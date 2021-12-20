@@ -299,8 +299,31 @@ namespace game_store_be.Controllers
                 )
                 .Where(e => e.IdGame != idGame)
                 .Take(amount);
-
-            return Ok(gameMoreLikeThis);
+            List<GameDto> gameMoreLikeThisDto = new List<GameDto>();
+            List<string> games = new List<string>();
+            foreach (var item in gameMoreLikeThis) {
+                games.Add(item.IdGame);
+            }
+            foreach(var item in games) {
+                var gamex = GetGameByIdGame(item);
+                gameMoreLikeThisDto.Add(gamex);
+            }
+            return Ok(gameMoreLikeThisDto);
+        }
+        private GameDto GetGameByIdGame(string idGame)
+        {
+            var existGame = _context.Game.Where(u => u.IdGame == idGame)
+                    .Include(u => u.IdDiscountNavigation)
+                    .Include(x => x.DetailGenre)
+                        .ThenInclude(x => x.IdGenreNavigation)
+                    .Include(x => x.ImageGameDetail);
+            if (existGame == null) return null;
+            var existGameDto = _mapper.Map<Game,GameDto>(existGame.First());
+            existGameDto.Discount = _mapper.Map<Discount, DiscountDto>(existGame.First().IdDiscountNavigation);
+            existGameDto.Genres = _mapper.Map<ICollection<DetailGenreDto>>(existGame.First().DetailGenre);
+            existGameDto.ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(existGame.First().ImageGameDetail.OrderBy(i=>i.Url));
+            
+            return existGameDto;
         }
         [Authorize]
         [HttpGet("installed")]
