@@ -84,7 +84,7 @@ namespace game_store_be.Controllers
             return Ok(discountDto);
         }
 
-        [Authorize]
+        [Authorize(Roles = "admin")]
         [HttpPut("update/{idDiscount}")]
         public IActionResult UpdateDiscountById(string idDiscount, [FromBody] PostDiscountBody newDiscountBody)
         {
@@ -121,6 +121,43 @@ namespace game_store_be.Controllers
             _mapper.Map<Discount, Discount>(newDiscount, existDiscount);
             _context.SaveChanges();
             return Ok(newDiscount);
+        }
+        [Authorize(Roles = "admin")]
+        [HttpDelete("delete/{idDiscount}")]
+        public IActionResult DeleteDiscount(string idDiscount){
+            var listGameDiscount = _context.Game.Where(g => g.IdDiscount == idDiscount).ToList();
+            foreach (var game in listGameDiscount) {
+                game.IdDiscount = null;
+            }
+           
+            var existDiscount = _context.Discount.FirstOrDefault(d => d.IdDiscount == idDiscount);
+            _context.Discount.Remove(existDiscount);
+
+            _context.SaveChanges();
+            return Ok("success");
+        }
+        [Authorize(Roles = "admin")]
+        [HttpGet("get-game-by-discount/{idDiscount}")]
+        public IActionResult GetGameByDiscount(string idDiscount){
+            var existGame = _context.Game.Where(g => g.IdDiscount == idDiscount).ToList();
+            var existGameDto = _mapper.Map<IEnumerable<GameDto>>(existGame).ToList(); 
+            return Ok(existGameDto);
+        }
+        [AllowAnonymous]
+        [HttpDelete("delete/outdate/{idDiscount}")]
+        public IActionResult DeleteDiscountOutDate(string idDiscount){
+            var existDiscount = _context.Discount.FirstOrDefault(d => d.IdDiscount == idDiscount);
+            if (existDiscount == null) return Ok();
+            int isOutDate = DateTime.Compare(existDiscount.EndDate,DateTime.Now);
+            if (isOutDate >= 0) return Ok();
+
+            var listGameDiscount = _context.Game.Where(g => g.IdDiscount == idDiscount).ToList();
+            if (listGameDiscount == null) return Ok();
+            foreach (var game in listGameDiscount) {
+                game.IdDiscount = null;
+            }
+            _context.SaveChanges();
+            return Ok();
         }
     }
 }

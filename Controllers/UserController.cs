@@ -85,16 +85,34 @@ namespace game_store_be.Controllers
             return tokenHandler.WriteToken(token);
         }
 
-        public Users ExistUser(string idUser)
+        private Users ExistUser(string idUser)
         {
             var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
             return existUser;
         }
-
-        [HttpGet]
-        public IActionResult GetAllUser()
+        private Users RegisterAccountSMA(Users newUser)
         {
-            var users = _context.Users.ToList();
+            newUser.IdUser = Guid.NewGuid().ToString();
+            newUser.Password = null;
+            newUser.Roles = "user";
+            newUser.ConfirmEmail = true;
+            var username ="";
+            while (true){
+                username = CreateUsername(newUser.RealName);
+                var existUsername = _context.Users.FirstOrDefault(u => u.UserName.ToLower() == username.ToLower());
+                if (existUsername == null) break;
+            }
+            
+            newUser.UserName = username;
+            newUser.Avatar = CreateAvatar(username);
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+            return newUser;
+        }
+        [HttpGet("{start}/{count}")]
+        public IActionResult GetAllUser(int start, int count)
+        {
+            var users = _context.Users.Skip(start).Take(count).ToList();
             var userDto = _mapper.Map<IEnumerable<UserDto>>(users);
             return Ok(userDto);
         }
@@ -190,25 +208,7 @@ namespace game_store_be.Controllers
             return Ok(CreateResLoginSuccess(existUser));
         }
 
-        public Users RegisterAccountSMA(Users newUser)
-        {
-            newUser.IdUser = Guid.NewGuid().ToString();
-            newUser.Password = null;
-            newUser.Roles = "user";
-            newUser.ConfirmEmail = true;
-            var username ="";
-            while (true){
-                username = CreateUsername(newUser.RealName);
-                var existUsername = _context.Users.FirstOrDefault(u => u.UserName.ToLower() == username.ToLower());
-                if (existUsername == null) break;
-            }
-            
-            newUser.UserName = username;
-            newUser.Avatar = CreateAvatar(username);
-            _context.Users.Add(newUser);
-            _context.SaveChanges();
-            return newUser;
-        }
+
         [AllowAnonymous]
         [HttpGet("check-valid-email/{email}")]
         public IActionResult CheckValidEmail(string email){
@@ -230,8 +230,8 @@ namespace game_store_be.Controllers
             }              
         }
 
-        [HttpPost("change-password")]
-        public IActionResult ChangePassword(){
+        [HttpPost("reset-password")]
+        public IActionResult ResetPassword(){
             string idUser = HttpContext.Request.Headers["idUser"];
             string pwd = HttpContext.Request.Headers["pwd"];
 
@@ -244,7 +244,24 @@ namespace game_store_be.Controllers
             _context.SaveChanges();
             return Ok("Change password sucessful !");
         }
-
+        [HttpPost("change-password")]
+        public IActionResult ChangePassword([FromBody] ChangePassBody pwd){
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == pwd.IdUser);
+            if (existUser == null) {
+                return NotFound("User not exists");
+            }
+            if (existUser.Password != HassPassword(pwd.CurrentPass)) return NotFound("Wrong current password");
+            existUser.Password = HassPassword(pwd.NewPass);
+            _context.SaveChanges();
+            return Ok("Change password sucessful !");
+        }
+        [HttpGet("check-sma-account/{idUser}")]
+        public IActionResult CheckSmaAccount(string idUser){
+            var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
+            if (existUser == null) return NotFound("not found user");
+            if (existUser.Password == null) return Ok("true");
+            return Ok("false");
+        }
         [HttpPut("change-info/{idUser}")]
         public IActionResult ChangeInfo(string idUser,[FromBody] Users infoUser){
             
@@ -256,6 +273,8 @@ namespace game_store_be.Controllers
             if (infoUser.Avatar != null) existUser.Avatar = infoUser.Avatar;
             if (infoUser.RealName != null) existUser.RealName = infoUser.RealName;
             if (infoUser.Background != null) existUser.Background = infoUser.Background;
+            if (infoUser.UserName != null) existUser.UserName = infoUser.UserName;
+            if (infoUser.NumberPhone != null) existUser.NumberPhone = infoUser.NumberPhone;
             _context.SaveChanges(); 
             var userDto = _mapper.Map<Users, UserDto>(existUser);
             return Ok(userDto);

@@ -35,8 +35,11 @@ namespace game_store_be.Controllers
             var collection = _context.Collection
                 .Where(c => c.IdUser == idUser)
                 .Include(c => c.IdGameNavigation)
+                    .ThenInclude(g => g.IdDiscountNavigation)
+                .Include(c => c.IdGameNavigation)
                     .ThenInclude(g => g.DetailGenre).ThenInclude(g => g.IdGenreNavigation)
                 .Include(c => c.IdGameNavigation).ThenInclude(g => g.ImageGameDetail);
+
             if (collection == null )
             {
                 return NotFound(new { message = "Not found" });
@@ -44,6 +47,17 @@ namespace game_store_be.Controllers
             var collectionsDto = customMapper.CustomMapListCollection(collection.ToList());
             var userDto = _mapper.Map<Users, UserDto>(user);
             return Ok(new { user = userDto, listGame = collectionsDto });
+        }
+        [AllowAnonymous]
+        [HttpGet("is-own-by-user/{idUser}/{idGame}")]
+        public IActionResult GetIsOwnByUser(string idUser, string idGame){
+            var existGame = _context.Collection
+                            .FirstOrDefault(c => c.IdGame == idGame && c.IdUser == idUser);
+            if (existGame == null) return NotFound("not found");
+            var existBill= _context.Bill
+                            .Where(b => b.IdUser == idUser && b.IdGame == idGame && b.Actions == "pay")
+                            .OrderByDescending(b => b.DatePay).FirstOrDefault();
+            return Ok(existBill);
         }
     }
 }

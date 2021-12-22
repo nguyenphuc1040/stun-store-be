@@ -14,7 +14,7 @@ namespace game_store_be.Dtos
         public double Cost { get; set; }
         public string Actions { get; set; }
         public BillDiscount DiscountApplied { get; set; }
-
+        public int TimeRefund {get; set;}
         public GameDto Game { get; set; }
         public UserDto User { get; set; }
     }

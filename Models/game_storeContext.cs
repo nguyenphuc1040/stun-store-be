@@ -30,6 +30,8 @@ namespace game_store_be.Models
         public virtual DbSet<Suggestion> Suggestion { get; set; }
         public virtual DbSet<LikeComment> LikeComment { get; set; }
 
+        public virtual DbSet<StorePolicy> StorePolicy { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -42,7 +44,15 @@ namespace game_store_be.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
+            modelBuilder.Entity<StorePolicy>(entity =>{
+                entity.HasKey(e => e.IdStorePolicy).HasName("pk_StorePolicy");
 
+                entity.Property(e => e.IdStorePolicy)
+                    .HasColumnName("idStorePolicy")
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50) unsigned");
+            });
 
             modelBuilder.Entity<Suggestion>(entity =>
             {
@@ -166,7 +176,7 @@ namespace game_store_be.Models
 
                 entity.Property(e => e.Content)
                     .HasColumnName("content")
-                    .HasColumnType("text");
+                    .HasColumnType("nvarchar(max)");
 
                 entity.Property(e => e.Dislike).HasColumnName("dislike");
 

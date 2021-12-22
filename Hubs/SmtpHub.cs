@@ -125,7 +125,7 @@ namespace SmtpManager
                                                 transition: .3s;
                                                 text-align: center;
                                                 padding-top: 13px;
-                                                text-decoration: none;' href='https://stun-store.vercel.app/email-verify/{url}'>
+                                                text-decoration: none;' href='https://stun-store.vercel.app/verify/{url}/confirm-acc'>
                                                     Confirm Account
                                                 </a>
                                             </div>
@@ -190,7 +190,7 @@ namespace SmtpManager
                                             transition: .3s;
                                             text-align: center;
                                             padding-top: 13px;
-                                            text-decoration: none;' href='https://stun-store.vercel.app/reset-pwd-verify/{url}'>
+                                            text-decoration: none;' href='https://stun-store.vercel.app/verify/{url}/rs-pwd'>
                                                 Reset Password
                                             </a>
                                         </div>
