@@ -2,6 +2,7 @@ using game_store_be.CustomModel;
 using game_store_be.Hubs;
 using game_store_be.Models;
 using game_store_be.Utils;
+using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +32,7 @@ namespace game_store_be
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(CertificateAuthenticationDefaults.AuthenticationScheme).AddCertificate();
             services.AddSignalR();
             services.AddDbContext<game_storeContext>(options => options
                .UseSqlServer("Server=103.142.139.104;Database=game_store;User=sa;Password=khai12345@"));
@@ -72,7 +74,7 @@ namespace game_store_be
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseAuthentication();
             app.UseHttpsRedirection();
 
             app.UseRouting();

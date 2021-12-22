@@ -406,7 +406,7 @@ namespace game_store_be.Controllers
             if (gameBrowse != null) return Ok(gameBrowse);
             return NotFound("Out of data");
         }
-        public IEnumerable<GameDto> GetGameBrowseAll(LazyLoadBrowseBody param)
+        private IEnumerable<GameDto> GetGameBrowseAll(LazyLoadBrowseBody param)
         {
             var games = _context.Game
                 .Include(x => x.IdDiscountNavigation)
@@ -422,6 +422,20 @@ namespace game_store_be.Controllers
                 gamesDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(games.ToList().ElementAt(i).ImageGameDetail.OrderBy(i => i.Url));
             }
             return gamesDto;
+        }
+
+        [HttpGet("search-game-by-name/{nameGame}")]
+        public IActionResult SearchGameByName(string nameGame){
+            var games = _context.Game
+                    .Include(x => x.ImageGameDetail)
+                    .Where(g => g.NameGame.ToLower().IndexOf(nameGame.ToLower())!=-1).ToList();
+            if (games == null) return NotFound();
+            var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
+            for (var i = 0; i < games.Count(); i++)
+            {
+                gamesDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(games.ToList().ElementAt(i).ImageGameDetail.OrderBy(i => i.Url));
+            }
+            return Ok(gamesDto);
         }
     }
 }

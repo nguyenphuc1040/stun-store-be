@@ -47,20 +47,29 @@ namespace game_store_be.Hubs
         {
             if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
-                
-                var existGame = _context.Game.FirstOrDefault(g => g.IdGame == newCmt.IdGame);
-                existGame.AverageRate = (newCmt.Star + existGame.AverageRate*existGame.NumOfRate)/(existGame.NumOfRate+1);
-                existGame.NumOfRate += 1;
-                
                 newCmt.IdComment = Guid.NewGuid().ToString();
                 newCmt.Likes = newCmt.Dislike = 0;
                 newCmt.Time = DateTime.Now;
-
-                
+     
                 _context.Comments.Add(newCmt);
                 _context.SaveChanges();
+
+                 
                 await Clients.Group(userConnection.Room)
-                    .SendAsync("ReceiveCreateComment", userConnection.User, newCmt, existGame.AverageRate);
+                    .SendAsync("ReceiveCreateComment", userConnection.User, newCmt);
+            }
+        }
+        public async Task UpdateRate(Comments newCmt){
+            if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
+            {
+                var existGame = _context.Game.FirstOrDefault(g => g.IdGame == newCmt.IdGame);
+                existGame.AverageRate = (existGame.AverageRate*existGame.NumOfRate + newCmt.Star)/(existGame.NumOfRate+1);
+                existGame.NumOfRate += 1;
+
+                _context.SaveChanges();
+
+                await Clients.Group(userConnection.Room)
+                    .SendAsync("ReceiveUpdateRate", userConnection.User, existGame.AverageRate);
             }
         }
         public async Task UpdateComment(Comments updateCmt,string idUserLike, string action)
@@ -157,7 +166,7 @@ namespace game_store_be.Hubs
                     existGame.NumOfRate -= 1;
                     _context.SaveChanges();
                     await Clients.Group(userConnection.Room)
-                        .SendAsync("ReceiveDeleteComment", userConnection.User, idComment, existGame.AverageRate);
+                        .SendAsync("ReceiveDeleteComment", userConnection.User, idComment,existGame.AverageRate);
                 } else
                 {
                     await Clients.Group(userConnection.Room)
