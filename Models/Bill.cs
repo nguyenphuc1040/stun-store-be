@@ -12,6 +12,7 @@ namespace game_store_be.Models
         public double Cost { get; set; }
         public string Actions { get; set; }
         public string Discount { get; set; }
+        public int TimeRefund {get; set;}
 
         public virtual Game IdGameNavigation { get; set; }
         public virtual Users IdUserNavigation { get; set; }

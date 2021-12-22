@@ -47,21 +47,17 @@ namespace game_store_be.Hubs
         {
             if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
+                
+                var existGame = _context.Game.FirstOrDefault(g => g.IdGame == newCmt.IdGame);
+                existGame.AverageRate = (newCmt.Star + existGame.AverageRate*existGame.NumOfRate)/(existGame.NumOfRate+1);
+                existGame.NumOfRate += 1;
+                
                 newCmt.IdComment = Guid.NewGuid().ToString();
                 newCmt.Likes = newCmt.Dislike = 0;
-                newCmt.Time = DateTime.UtcNow;
-                _context.Comments.Add(newCmt);
-                var existGame = new Game();
-                // try {
-                //     existGame = _context.Game.FirstOrDefault(g => g.IdGame == newCmt.IdGame);
-                //     existGame.AverageRate = (newCmt.Star + existGame.AverageRate*existGame.NumOfRate)/(existGame.NumOfRate+1);
-                //     existGame.NumOfRate += 1;
-                // } catch (Exception e) {
-                //     Console.WriteLine(e);
-                //     throw e;
-                // }
-                
+                newCmt.Time = DateTime.Now;
 
+                
+                _context.Comments.Add(newCmt);
                 _context.SaveChanges();
                 await Clients.Group(userConnection.Room)
                     .SendAsync("ReceiveCreateComment", userConnection.User, newCmt, existGame.AverageRate);

@@ -72,18 +72,26 @@ namespace game_store_be.Controllers
                 {
                     if (existGame.IdDiscountNavigation != null)
                     {
-                        cost = (double)((double)existGame.Cost * (1 - existGame.IdDiscountNavigation.PercentDiscount / 100));
-                        var billDiscount = _mapper.Map<Discount, BillDiscount>(existGame.IdDiscountNavigation);
-                        billBody.NewBill.Discount = JsonConvert.SerializeObject(billDiscount);
+                        int discountExpStart = DateTime.Compare(DateTime.Now,existGame.IdDiscountNavigation.StartDate);
+                        int discountExpEnd = DateTime.Compare(existGame.IdDiscountNavigation.EndDate,DateTime.Now);
+                        if (discountExpStart >= 0 && discountExpEnd >= 0) {
+                            cost = (double)((double)existGame.Cost * (1 - existGame.IdDiscountNavigation.PercentDiscount / 100));
+                            var billDiscount = _mapper.Map<Discount, BillDiscount>(existGame.IdDiscountNavigation);
+                            billBody.NewBill.Discount = JsonConvert.SerializeObject(billDiscount);
+                        }
+                        else {
+                            cost = (double)existGame.Cost;
+                        }                        
                     }
                     else
                     {
                         cost = (double)existGame.Cost;
                     }
                 }
-
+                var existRefundPolicy = _context.StorePolicy.FirstOrDefault(s => s.NamePolicy == "store-refund-policy");
                 billBody.NewBill.Cost = Math.Ceiling(cost);
-                billBody.NewBill.DatePay = DateTime.UtcNow;
+                billBody.NewBill.DatePay = DateTime.Now;
+                billBody.NewBill.TimeRefund = existRefundPolicy.DigitValue;
                 billBody.NewBill.IdUserNavigation = existUser;
 
                 if (billBody.NewBill.Actions == "refund")
@@ -112,7 +120,8 @@ namespace game_store_be.Controllers
                 //  Case game free
                 if (billBody.NewBill.Cost <= 0)
                 {
-                    billBody.NewBill.DatePay = DateTime.UtcNow;
+                    billBody.NewBill.DatePay = DateTime.Now;
+                    existGame.NumberOfBuyer ++;
                     _context.Bill.Add(billBody.NewBill);
                     _context.SaveChanges();
                     var billDto = customMapper.CustomMapBill(billBody.NewBill);
@@ -129,12 +138,11 @@ namespace game_store_be.Controllers
                     MasterCardCCV = 657,
                     MasterCardExpire = "11/21"
                 };
-
                 var trans = new Transaction()
                 {
                     MasterCardNumberSend = isRefund ? cardDefault.MasterCardNumber : card.MasterCardNumber,
                     MasterCardNumberReceive = isRefund ? card.MasterCardNumber : cardDefault.MasterCardNumber,
-                    TransactionMessage = isRefund ? "Refund " : "Payment for ",
+                    TransactionMessage = isRefund ? $"Refund Game {existGame.NameGame}" : $"Payment for Game {existGame.NameGame}",
                     AmountOfMoney = billBody.NewBill.Cost,
                 };
 
@@ -147,7 +155,8 @@ namespace game_store_be.Controllers
                 var contentString = res.Content.ReadAsStringAsync().Result;
                 if (contentString == "\"accept\"")
                 {
-                    billBody.NewBill.DatePay = DateTime.UtcNow;
+                    billBody.NewBill.DatePay = DateTime.Now;
+                    existGame.NumberOfBuyer += billBody.NewBill.Actions == "refund" ? -1 : 1;
                     _context.Bill.Add(billBody.NewBill);
                     _context.SaveChanges();
                     var billDto = customMapper.CustomMapBill(billBody.NewBill);

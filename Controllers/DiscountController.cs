@@ -140,7 +140,8 @@ namespace game_store_be.Controllers
         [HttpGet("get-game-by-discount/{idDiscount}")]
         public IActionResult GetGameByDiscount(string idDiscount){
             var existGame = _context.Game.Where(g => g.IdDiscount == idDiscount).ToList();
-            return Ok(existGame);
+            var existGameDto = _mapper.Map<IEnumerable<GameDto>>(existGame).ToList(); 
+            return Ok(existGameDto);
         }
         [AllowAnonymous]
         [HttpDelete("delete/outdate/{idDiscount}")]
@@ -148,9 +149,10 @@ namespace game_store_be.Controllers
             var existDiscount = _context.Discount.FirstOrDefault(d => d.IdDiscount == idDiscount);
             if (existDiscount == null) return Ok();
             int isOutDate = DateTime.Compare(existDiscount.EndDate,DateTime.Now);
-            if (isOutDate <= 0) return Ok();
+            if (isOutDate >= 0) return Ok();
 
             var listGameDiscount = _context.Game.Where(g => g.IdDiscount == idDiscount).ToList();
+            if (listGameDiscount == null) return Ok();
             foreach (var game in listGameDiscount) {
                 game.IdDiscount = null;
             }

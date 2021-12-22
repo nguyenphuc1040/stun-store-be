@@ -15,7 +15,6 @@ namespace game_store_be.Models
         public string Title { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-
         public virtual ICollection<Game> Game { get; set; }
     }
 }
