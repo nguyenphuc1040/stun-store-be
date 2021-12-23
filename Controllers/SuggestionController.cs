@@ -62,6 +62,7 @@ namespace game_store_be.Controllers
         public IActionResult GetGameSuggestion(string title, int count, int start){
             var existSuggestion = _context.Suggestion
                 .FirstOrDefault(sg => sg.Title == title);
+            if (existSuggestion.Value == null) return NotFound();
             string[] listGameStr = existSuggestion.Value.Split(",");
 
             List<GameDto> listGame = new List<GameDto>();
@@ -92,6 +93,7 @@ namespace game_store_be.Controllers
         public IActionResult GetGameSuggestionNotification(){
             var existGame = _context.Game.Where(g => g.IdDiscount != null).ToList();
             var length = existGame.Count();
+            if (length == 0) return NotFound();
             Random r = new Random();
             var game = existGame[r.Next(0,length)];
             var gameDto = GetGameById(game.IdGame);

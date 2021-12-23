@@ -90,7 +90,7 @@ namespace game_store_be.Controllers
                 }
                 var existRefundPolicy = _context.StorePolicy.FirstOrDefault(s => s.NamePolicy == "store-refund-policy");
                 billBody.NewBill.Cost = Math.Ceiling(cost);
-                billBody.NewBill.DatePay = DateTime.Now;
+                billBody.NewBill.DatePay = DateTime.UtcNow;
                 billBody.NewBill.TimeRefund = existRefundPolicy.DigitValue;
                 billBody.NewBill.IdUserNavigation = existUser;
 
@@ -120,7 +120,7 @@ namespace game_store_be.Controllers
                 //  Case game free
                 if (billBody.NewBill.Cost <= 0)
                 {
-                    billBody.NewBill.DatePay = DateTime.Now;
+                    billBody.NewBill.DatePay = DateTime.UtcNow;
                     existGame.NumberOfBuyer ++;
                     _context.Bill.Add(billBody.NewBill);
                     _context.SaveChanges();

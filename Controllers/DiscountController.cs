@@ -77,7 +77,8 @@ namespace game_store_be.Controllers
                     gameFound.IdDiscount = idDiscount;
                 }
             }
-
+            Console.WriteLine(DateTime.UtcNow.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss.fffffffK"));
+                       Console.WriteLine(newDiscount.StartDate.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss.fffffffK"));
             _context.Discount.Add(newDiscount);
             _context.SaveChanges();
             var discountDto = _mapper.Map<Discount, DiscountDto>(newDiscount);
