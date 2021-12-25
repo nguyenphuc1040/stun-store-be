@@ -37,7 +37,11 @@ namespace game_store_be.Controllers
         {
             return (_context.Bill.Where(b => b.IdUser == idUser && b.IdGame == idGame).ToList());
         }
-
+        
+        /// <summary>
+        /// Get all Bill [admin]
+        /// </summary>
+        /// <returns>an array Bill data</returns>
         [Authorize(Roles = "admin")]
         [HttpGet]
         public IActionResult GetAllBill()
@@ -54,6 +58,11 @@ namespace game_store_be.Controllers
             return Ok(billsDto);
         }
 
+        /// <summary>
+        /// Create new bill [admin,user]
+        /// </summary>
+        /// <param name="billBody"></param>
+        /// <returns>an new bill</returns>
         [Authorize(Roles = "admin, user")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateNewBill([FromBody] PostBillBody billBody)

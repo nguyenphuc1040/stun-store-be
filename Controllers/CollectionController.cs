@@ -27,6 +27,11 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get all Collection by idUser
+        /// </summary>
+        /// <param name="idUser"></param>
+        /// <returns>an array collection</returns>
         [HttpGet("{idUser}")]
         public IActionResult GetAllCollection(string idUser)
         {
