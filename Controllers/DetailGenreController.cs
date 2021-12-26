@@ -24,6 +24,10 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get all detail Genre
+        /// </summary>
+        /// <returns>an array Detail Genre</returns>
         [HttpGet]
         public IActionResult GetAllDetailGenre ()
         {
@@ -31,6 +35,11 @@ namespace game_store_be.Controllers
             return Ok(detailGenres);
         }
 
+        /// <summary>
+        /// Create new Detail Genre [admin]
+        /// </summary>
+        /// <param name="newDetailGenre"></param>
+        /// <returns>a new detail Genre</returns>
         [Authorize(Roles ="admin")]
         [HttpPost("create")]
         public IActionResult CreateDetailGenre([FromBody] DetailGenre newDetailGenre )

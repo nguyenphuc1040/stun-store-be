@@ -23,6 +23,11 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get comment by idGame
+        /// </summary>
+        /// <param name="idGame"></param>
+        /// <returns>an array comment by idGamm</returns>
         [HttpGet("{idGame}")]
         public IActionResult GetCommentByIdGame(string idGame)
         {
@@ -33,6 +38,12 @@ namespace game_store_be.Controllers
 
             return Ok(commentsDto);
         }
+
+        /// <summary>
+        /// Get comment count by idGame
+        /// </summary>
+        /// <param name="idGame"></param>
+        /// <returns>a count comment</returns>
         [HttpGet("count/{idGame}")]
         public IActionResult GetCommentCountByIdGame(string idGame)
         {
@@ -41,6 +52,11 @@ namespace game_store_be.Controllers
 
             return Ok(comments);
         }
+
+        /// <summary>
+        /// Get all comment
+        /// </summary>
+        /// <returns>an array comment</returns>
         [HttpGet]
         public IActionResult GetAllComment()
         {
@@ -50,6 +66,12 @@ namespace game_store_be.Controllers
             return Ok(commentsDto);
         }
 
+        /// <summary>
+        /// Get comment of Game of User( by idGame, idUser)
+        /// </summary>
+        /// <param name="idGame"></param>
+        /// <param name="idUser"></param>
+        /// <returns>an array comment</returns>
         [HttpGet("{idGame}/{idUser}")]
         public IActionResult GetCommentOfGameOfUser(string idGame, string idUser){
             
