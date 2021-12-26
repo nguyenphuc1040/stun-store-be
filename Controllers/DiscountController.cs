@@ -30,6 +30,10 @@ namespace game_store_be.Controllers
             return _context.Discount.FirstOrDefault(dc => dc.IdDiscount == idDiscount);
         }
 
+        /// <summary>
+        /// Get all discount
+        /// </summary>
+        /// <returns>an array Discount</returns>
         [HttpGet]
         public IActionResult GetAllDiscount()
         {
@@ -38,6 +42,11 @@ namespace game_store_be.Controllers
             return Ok(discountDto);
         }
 
+        /// <summary>
+        /// Get discount by id
+        /// </summary>
+        /// <param name="idDiscount"></param>
+        /// <returns>a discount </returns>
         [HttpGet("{idDiscount}")]
         public IActionResult GetDiscountById(string idDiscount)
         {
@@ -50,6 +59,11 @@ namespace game_store_be.Controllers
             return Ok(discountDto);
         }
 
+        /// <summary>
+        /// Create new discount [admin]
+        /// </summary>
+        /// <param name="newDiscountBody"></param>
+        /// <returns></returns>
         [Authorize(Roles = "admin")]
         [HttpPost("create")]
         public IActionResult CreateDiscount([FromBody] PostDiscountBody newDiscountBody)
@@ -84,6 +98,12 @@ namespace game_store_be.Controllers
             return Ok(discountDto);
         }
 
+        /// <summary>
+        /// Update discount by id
+        /// </summary>
+        /// <param name="idDiscount"></param>
+        /// <param name="newDiscountBody"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpPut("update/{idDiscount}")]
         public IActionResult UpdateDiscountById(string idDiscount, [FromBody] PostDiscountBody newDiscountBody)

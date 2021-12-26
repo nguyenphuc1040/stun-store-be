@@ -28,6 +28,11 @@ namespace game_store_be.Controllers
         {
             return _context.Game.Include(g => g.IdDiscountNavigation).FirstOrDefault(g => g.IdGame == idGame);
         }
+
+        /// <summary>
+        /// Get all Game
+        /// </summary>
+        /// <returns>an array Game</returns>
         [HttpGet]
         public IActionResult GetAllGame()
         {
@@ -46,6 +51,11 @@ namespace game_store_be.Controllers
             return Ok(gamesDto);
         }
 
+        /// <summary>
+        /// Get gane by idGame
+        /// </summary>
+        /// <param name="idGame"></param>
+        /// <returns></returns>
         [HttpGet("{idGame}")]
         public IActionResult GetGameById(string idGame)
         {
@@ -62,6 +72,11 @@ namespace game_store_be.Controllers
             return Ok(existGameDto);
         }
 
+        /// <summary>
+        /// Create a new Game
+        /// </summary>
+        /// <param name="newGameBody"></param>
+        /// <returns></returns>
         [Authorize(Roles = "admin")]
         [HttpPost("create")]
         public IActionResult CreateGame([FromBody] PostGameBody newGameBody)
@@ -132,6 +147,12 @@ namespace game_store_be.Controllers
             return Ok(new { newGameDto, newGameVersionDto });
         }
 
+        /// <summary>
+        /// Update Game by Id
+        /// </summary>
+        /// <param name="idGame"></param>
+        /// <param name="newGameBody"></param>
+        /// <returns></returns>
         [HttpPut("update/{idGame}")]
         public IActionResult UpdateGame(string idGame, [FromBody] PostGameBody newGameBody)
         {
@@ -198,6 +219,13 @@ namespace game_store_be.Controllers
             return Ok(new { newGameDto, newGameVersionDto });
         }
 
+
+        /// <summary>
+        /// Get Game more like this
+        /// </summary>
+        /// <param name="idGame"></param>
+        /// <param name="amount"></param>
+        /// <returns></returns>
         [HttpGet("more-like-this/{idGame}/{amount}")]
         public IActionResult GetGameMoreLikeThis(string idGame, int amount)
         {
@@ -221,6 +249,11 @@ namespace game_store_be.Controllers
 
             return Ok(gameMoreLikeThis);
         }
+
+        /// <summary>
+        /// Get dowloaded of Game
+        /// </summary>
+        /// <returns></returns>
         [Authorize]
         [HttpGet("installed")]
         public IActionResult UpdateDownloadedOfGame(){
