@@ -42,9 +42,6 @@ namespace game_store_be.Controllers
         [HttpGet]
         public IActionResult GetAllBill()
         {
-            var billss = _context.Bill.ToList();
-            return Ok(billss);
-
             var customMapper = new CustomMapper(_mapper);
             var bills = _context.Bill
                 .Include(b => b.IdGameNavigation)
@@ -53,7 +50,24 @@ namespace game_store_be.Controllers
             var billsDto = customMapper.CustomMapListBill(bills);
             return Ok(billsDto);
         }
-
+        [Authorize(Roles = "admin")]
+        [HttpGet("{idGame}/{start}/{count}")]
+        public IActionResult GetBillByIdGame(string idGame, int start, int count) {
+            var customMapper = new CustomMapper(_mapper);
+            var bills = _context.Bill.Where(b => b.IdGame == idGame).Skip(start).Take(count).OrderByDescending(d => d.DatePay).ToList();
+            var billsDto = customMapper.CustomMapListBill(bills);
+            return Ok(billsDto);
+        }
+        [Authorize(Roles = "admin")]
+        [HttpGet("revenue/{idGame}")]
+        public IActionResult GetRevenueGameById(string idGame) {
+            var bills = _context.Bill.Where(b => b.IdGame == idGame && b.Cost != 0).ToList();
+            double revenue = 0;
+            foreach (var item in bills) {
+                revenue += item.Actions == "pay" ? item.Cost : -item.Cost;
+            }
+            return Ok(revenue);
+        }
         [Authorize(Roles = "admin, user")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateNewBill([FromBody] PostBillBody billBody)

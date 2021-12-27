@@ -57,5 +57,15 @@ namespace game_store_be.Controllers
                 .FirstOrDefault(cmt => cmt.IdUser == idUser && cmt.IdGame == idGame);
             return Ok(comments);
         }
+        [HttpGet("rates/{idGame}/{start}/{count}")]
+        public IActionResult GetCommentOfGameOfUser(string idGame, int start, int count){
+            
+            var comments = _context.Comments
+                .Where(cmt => cmt.IdGame == idGame)
+                .OrderBy(cmt => cmt.Time).ToList().Skip(start).Take(count);
+            var commentsDto = _mapper.Map<IEnumerable<CommentsDto>>(comments);
+
+            return Ok(commentsDto);
+        }
     }
 }
