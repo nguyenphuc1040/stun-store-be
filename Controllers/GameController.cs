@@ -427,12 +427,14 @@ namespace game_store_be.Controllers
         [HttpGet("search-game-by-name/{nameGame}")]
         public IActionResult SearchGameByName(string nameGame){
             var games = _context.Game
+                    .Include(x => x.IdDiscountNavigation)
                     .Include(x => x.ImageGameDetail)
                     .Where(g => g.NameGame.ToLower().IndexOf(nameGame.ToLower())!=-1).ToList();
             if (games == null) return NotFound();
             var gamesDto = _mapper.Map<IEnumerable<GameDto>>(games);
             for (var i = 0; i < games.Count(); i++)
             {
+                gamesDto.ToList().ElementAt(i).Discount = _mapper.Map<Discount, DiscountDto>(games.ToList().ElementAt(i).IdDiscountNavigation);
                 gamesDto.ToList().ElementAt(i).ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(games.ToList().ElementAt(i).ImageGameDetail.OrderBy(i => i.Url));
             }
             return Ok(gamesDto);
