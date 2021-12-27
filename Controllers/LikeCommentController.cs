@@ -20,6 +20,12 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get like comment
+        /// </summary>
+        /// <param name="idComment"></param>
+        /// <param name="idUser"></param>
+        /// <returns></returns>
         [HttpGet("{idComment}/{idUser}")]
         public IActionResult LikeCommentUserInComment(string idComment, string idUser){
             
@@ -30,6 +36,12 @@ namespace game_store_be.Controllers
             
             return Ok(existLikeComment.IsLike ? new {own = "1"} : new {own = "0"});
         }
+
+        /// <summary>
+        /// Get count like comment by id
+        /// </summary>
+        /// <param name="idComment"></param>
+        /// <returns></returns>
         [HttpGet("{idComment}")]
         public IActionResult GetCountLikeComment(string idComment){
             
@@ -41,6 +53,11 @@ namespace game_store_be.Controllers
             return Ok(new {like = existLikeComment, dislike = existDisLikeComment});
         }
 
+        /// <summary>
+        /// Get update like comment
+        /// </summary>
+        /// <param name="likeCmt"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpPut("update")]
         public IActionResult UpdateLikeComment([FromBody] LikeComment likeCmt){
@@ -56,6 +73,11 @@ namespace game_store_be.Controllers
             return Ok(existLikeComment);
         }
 
+        /// <summary>
+        /// Delete Like comment
+        /// </summary>
+        /// <param name="likeCmt"></param>
+        /// <returns></returns>
         // [Authorize]
         [HttpDelete("delete")]
         public IActionResult DeleteLikeComment([FromBody] LikeComment likeCmt){

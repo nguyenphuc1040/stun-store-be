@@ -23,6 +23,10 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get all image detail
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult GetAllImageDetail()
         {
@@ -30,6 +34,11 @@ namespace game_store_be.Controllers
             return Ok(imageDetails);
         }
 
+        /// <summary>
+        /// Create new image detail
+        /// </summary>
+        /// <param name="newImageDetail"></param>
+        /// <returns></returns>
         //[Authorize]
         [HttpPost("create")]
         public IActionResult CreateImageDetail([FromBody] ImageGameDetail newImageDetail)
@@ -40,11 +49,21 @@ namespace game_store_be.Controllers
             return Ok(newImageDetail);
         }
 
+        /// <summary>
+        /// Update
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="value"></param>
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
 
+        /// <summary>
+        /// Delete Image Detail
+        /// </summary>
+        /// <param name="imageGameDetail"></param>
+        /// <returns></returns>
         [HttpDelete("delete")]
         public IActionResult DeleteImageDetail ([FromBody] ImageGameDetail imageGameDetail )
         {
