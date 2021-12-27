@@ -25,6 +25,11 @@ namespace game_store_be.Controllers
             _context = context;
             _mapper = mapper;
         }
+
+        /// <summary>
+        /// Get all game version
+        /// </summary>
+        /// <returns>all version Game</returns>
         [HttpGet]
         public IActionResult GetAllGameVersion()
         {
@@ -32,6 +37,11 @@ namespace game_store_be.Controllers
             return Ok(gamesVersions);
         }
 
+        /// <summary>
+        /// Create a new Game version [admin]
+        /// </summary>
+        /// <param name="newGameVersion"></param>
+        /// <returns></returns>
         [Authorize(Roles = "admin")]
         [HttpPost("create")]
         public IActionResult CreateGameVersion([FromBody] GameVersion newGameVersion)
@@ -42,6 +52,11 @@ namespace game_store_be.Controllers
             return Ok(newGameVersion);
         }
 
+        /// <summary>
+        /// Get version by IdGame [admin]
+        /// </summary>
+        /// <param name="idGame"></param>
+        /// <returns></returns>
         [Authorize(Roles = "admin")]
         [HttpGet("by-game/{idGame}")]
         public IActionResult GetVersionByIdGame(string idGame)
@@ -51,15 +66,11 @@ namespace game_store_be.Controllers
             return Ok(existGameDto);
         }
 
-        
-        /**
-        * API GET new-version of Game by idGame
-        * @param {String} idGame
-        * @return {JSON) 
-        * status: 200 : ok
-        * status: 404 : notfound
-        */
-
+        /// <summary>
+        /// Get new version by IdGame
+        /// </summary>
+        /// <param name="idGame"></param>
+        /// <returns></returns>
         [HttpGet("by-game/new-version/{idGame}")]
         public IActionResult GetNewVersionByIdGame(string idGame)
         {
@@ -80,6 +91,13 @@ namespace game_store_be.Controllers
 
             return Ok(existGameDto);
         }
+
+        /// <summary>
+        ///  Get New Version By IdGame And LastestVersion
+        /// </summary>
+        /// <param name="idGame"></param>
+        /// <param name="lastestVersion"></param>
+        /// <returns></returns>
         [HttpGet("by-game/{idGame}/{lastestVersion}")]
         public IActionResult GetNewVersionByIdGameAndLastestVersion(string idGame, string lastestVersion)
         {
@@ -110,6 +128,11 @@ namespace game_store_be.Controllers
 
             return Ok(existGameDto);
         }
+
+        /// <summary>
+        /// Get UrlDownload By IdGameVersion
+        /// </summary>
+        /// <returns></returns>
         [Authorize]
         [HttpGet("by-game/url-download")]
         public IActionResult GetUrlDownloadByIdGameVersion()

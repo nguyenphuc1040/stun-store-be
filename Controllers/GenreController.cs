@@ -29,6 +29,10 @@ namespace game_store_be.Controllers
             return _context.Genre.FirstOrDefault(u => u.IdGenre == idGenre);
         }
 
+        /// <summary>
+        /// Get all Genres
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult GetGenres()
         {
@@ -37,6 +41,11 @@ namespace game_store_be.Controllers
             return Ok(genresDto);
         }
 
+        /// <summary>
+        /// Get Genre by id
+        /// </summary>
+        /// <param name="idGenre"></param>
+        /// <returns></returns>
         [HttpGet("{idGenre}")]
         public IActionResult GetGenreById(string idGenre)
         {
@@ -49,6 +58,11 @@ namespace game_store_be.Controllers
             return Ok(genreDto);
         }
 
+        /// <summary>
+        /// Create new Genre [admin]
+        /// </summary>
+        /// <param name="newGenre"></param>
+        /// <returns></returns>
         [Authorize(Roles ="admin")]
         [HttpPost("create")]
         public IActionResult CreateNewGenre([FromBody] Genre newGenre)
@@ -60,6 +74,12 @@ namespace game_store_be.Controllers
             return Ok(genreDto);
         }
 
+        /// <summary>
+        /// Update Genre by Id
+        /// </summary>
+        /// <param name="idGenre"></param>
+        /// <param name="newGenre"></param>
+        /// <returns></returns>
         [Authorize(Roles = "admin")]
         [HttpPut("update/{idGenre}")]
         public IActionResult UpdateGenreById(string idGenre, [FromBody] GenreDto newGenre)
