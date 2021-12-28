@@ -30,7 +30,8 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
 
-        public WishList ExistWishList (string idGame, string idUser)
+
+        protected WishList ExistWishList (string idGame, string idUser)
         {
             return (_context.WishList.FirstOrDefault(u => u.IdGame == idGame && u.IdUser == idUser));
         }

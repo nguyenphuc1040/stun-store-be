@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace game_store_be.Controllers
 {
+    /// <summary>
+    /// Weather Controler 
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
@@ -23,6 +26,11 @@ namespace game_store_be.Controllers
             _logger = logger;
         }
 
+
+        /// <summary>
+        /// This GET method retunrn fake weather
+        /// </summary>
+        /// <returns> An array of the weathers</returns>
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {

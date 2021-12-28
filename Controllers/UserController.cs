@@ -81,12 +81,17 @@ namespace game_store_be.Controllers
             return tokenHandler.WriteToken(token);
         }
 
-        public Users ExistUser(string idUser)
+
+        protected Users ExistUser(string idUser)
         {
             var existUser = _context.Users.FirstOrDefault(u => u.IdUser == idUser);
             return existUser;
         }
 
+        /// <summary>
+        /// Get all User  
+        /// </summary>
+        /// <returns>Sn array of users</returns>
         [HttpGet]
         public IActionResult GetAllUser()
         {
@@ -95,6 +100,11 @@ namespace game_store_be.Controllers
             return Ok(userDto);
         }
         
+        /// <summary>
+        /// Get user by id 
+        /// </summary>
+        /// <param name="idUser"></param>
+        /// <returns>User Dat</returns>
         [HttpGet("{idUser}")]
         public IActionResult GetUserById(string idUser)
         {
@@ -107,6 +117,11 @@ namespace game_store_be.Controllers
             return Ok(userDto);
         }
 
+        /// <summary>
+        /// Register new user
+        /// </summary>
+        /// <param name="newUser"></param>
+        /// <returns>User Data</returns>
         [AllowAnonymous]
         [HttpPost("register")]
         public IActionResult Register([FromBody] Users newUser)
@@ -120,6 +135,11 @@ namespace game_store_be.Controllers
             return Ok(newUser);
         }
 
+        /// <summary>
+        /// Login to game store
+        /// </summary>
+        /// <param name="infoLogin"></param>
+        /// <returns>Status login</returns>
         [AllowAnonymous]
         [HttpPost("login")]
         public IActionResult Login([FromBody] Login infoLogin)
@@ -150,6 +170,12 @@ namespace game_store_be.Controllers
             return Ok(CreateResLoginSuccess(user));
         }
 
+        /// <summary>
+        /// Update user data with ID
+        /// </summary>
+        /// <param name="idUser"></param>
+        /// <param name="newUser"></param>
+        /// <returns>User data updated</returns>
         [HttpPut("update/{idUser}")]
         public IActionResult UpdateUser(string idUser, [FromBody] UserDto newUser)
         {
