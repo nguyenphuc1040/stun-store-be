@@ -30,6 +30,11 @@ namespace game_store_be.Controllers
             return _context.SlideGameHot.FirstOrDefault(dc => dc.IdGame == idGame);
         }
         
+        /// <summary>
+        /// Create Slide Game Hot [admin]
+        /// </summary>
+        /// <param name="newSlide"></param>
+        /// <returns></returns>
         [Authorize(Roles = "admin")]
         [HttpPost("create")]
         public IActionResult CreateSlideGameHot([FromBody] SlideGameHot newSlide)
@@ -39,6 +44,10 @@ namespace game_store_be.Controllers
             return Ok(newSlide);
         }
 
+        /// <summary>
+        /// Get all slide Game hot
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult GetAllSlideGameHot()
         {

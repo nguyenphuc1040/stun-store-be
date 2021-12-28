@@ -24,12 +24,21 @@ namespace game_store_be.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get all suggestion
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult GetAllSuggestion()
         {
             return Ok(_context.Suggestion.ToList());
         }
 
+        /// <summary>
+        /// Create new suggestion
+        /// </summary>
+        /// <param name="newSuggestion"></param>
+        /// <returns></returns>
         [HttpPost("create")]
         public IActionResult CreateNewSuggestion([FromBody] Suggestion newSuggestion)
         {
@@ -39,6 +48,11 @@ namespace game_store_be.Controllers
             return Ok(newSuggestion);
         }
 
+        /// <summary>
+        /// Update Suggestion
+        /// </summary>
+        /// <param name="updateSuggestion"></param>
+        /// <returns></returns>
         [HttpPut("update")]
         public IActionResult UpdateSuggestion([FromBody] Suggestion updateSuggestion)
         {
