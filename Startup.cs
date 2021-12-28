@@ -95,7 +95,7 @@ namespace game_store_be
             {
                 options.AddDefaultPolicy(builder =>
                 {
-                    builder.AllowAnyOrigin()
+                     builder.WithOrigins("http://localhost:3000","http://localhost:3000", "https://stun-store-preview-puce.vercel.app","https://localhost:3000","https://stun-store.vercel.app","http://stun-store.ngovankhai.site")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
