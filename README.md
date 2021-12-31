@@ -2,6 +2,10 @@
 
 ### Link Diagram Database: [Click Here](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007)
 
+### Link Design: [Click Here](### Link Diagram Database: [Click Here](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007))
+
+### Link Demo Web: [Click Here](### Link Diagram Database: [Click Here](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007))
+
 ### Team
 
 - Trần Đình Khôi (Leader) - [https://github.com/Khoiwall](https://github.com/Khoiwall)
@@ -26,7 +30,7 @@
 
 ### How to run
 
-    $ dotnet run
+    $ dotnet watch run
 
 ### Description
 
@@ -34,12 +38,13 @@
 
 ### Framework
 
-    ASP.NET Core 3.1
+    - ASP.NET Core 3.1
 
 ### Library
 
-    ...
+    - Entity framework
+    - Swagger
 
 ### Database Management System
 
-    SQl Server
+    - SQl Server
