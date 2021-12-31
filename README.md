@@ -48,7 +48,7 @@
       $ yarn start
 
 ### Mô tả
-Hê thống web cung cấp và mua bán game trực tuyến. Giúp người dùng có nhiều trải nghiệm mới 
+Stun Store là website cung cấp miễn phí và mua bán các thể loại game trực tuyến.  Giao diện website được thiết kế chuyên nghiệp với màu đen là màu sắc chủ đạo tạo cảm giác huyền bí, mạnh mẽ mà không kém phần thu hút, kết hợp cùng các hiệu ứng bắt mắt tạo cảm giác mới lạ cho người dùng. Bên cạnh đó, Stun Store hỗ trợ người dùng ở mọi thiết bị và có thể thích ứng được với tất cả các thiết bị, kích thước màn hình lớn nhỏ khác nhau. Ngoài các chức năng cơ bản, Stun Store cho phép người dùng xem và đưa ra đánh giá về các tựa game , tăng khả năng trải nghiệm cho người sử dụng. Có thể chơi game và trải nghiệm thực tế thông qua laucher . Nếu trải nghiệm game không tốt hoặc không phù hợp, bạn có thể hoàn trả game theo chính sách.
 
 ### Công nghệ sử dụng
 - Design: Figma
