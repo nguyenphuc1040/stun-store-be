@@ -29,11 +29,11 @@
   - [example]
 
 ### Cài đặt 
-    - Backend: 
+- Backend: 
       $ git clone https://github.com/nguyenphuc1040/framework_IS220.M11_16_back-end.git
       $ cd framework_IS220.M11_16_back-end
       $ dotnet watch run
-    - Frontend: 
+- Frontend: 
       $ git clone https://github.com/nguyenphuc1040/framework_IS220.M11_16_front-end.git
       $ cd framework_IS220.M11_16_front-end
       $ yarn install
