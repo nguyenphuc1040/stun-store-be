@@ -2,9 +2,9 @@
 
 ### Link Diagram Database: [Xem thêm](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007)
 
-### Link Design: [Xem thêm](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007))
+### Link Design: [Xem thêm](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007)
 
-### Link Demo Web: [Xem thêm](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007))
+### Link Demo Web: [Xem thêm](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007)
 
 ### Thành viên nhóm
 
@@ -60,6 +60,8 @@ Hê thống web cung cấp và mua bán game trực tuyến. Giúp người dùn
     
 ### Chức năng đã có
 - Chức năng thêm, xóa, sửa
+- Tìm kiếm game
+- Lọc game theo thể loại
 - Mua game,hoàn trả game
 - Đăng nhập, đăng kí (Email, Google, Facebook, ...)
 - Admin quản lý
@@ -135,6 +137,8 @@ Hê thống web cung cấp và mua bán game trực tuyến. Giúp người dùn
 
 ### Current Hepler: 
 - CRUD
+- Search game
+- Filter game by genres
 - Pay, refund game
 - Sign in, sign up (Email, Google, Facebook, ...)
 - Admin
