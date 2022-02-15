@@ -1,10 +1,8 @@
 ## Web API Stun Store  (Tiếng Việt)
 
-### Link Diagram Database: [Xem thêm](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007)
+### Link Design: [Click Here](https://www.figma.com/file/PyrhA02MocSgTN3iHlh6Dm/WebGameDesign?node-id=0%3A1)
 
-### Link Design: [Xem thêm](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007)
-
-### Link Demo Web: [Xem thêm](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007)
+### Link Demo Web: [Click Here](http://stun-store.ngovankhai.site/)
 
 ### Thành viên nhóm
 
@@ -14,19 +12,12 @@
 - Ngô Văn Khải - [https://github.com/khai2k](https://github.com/khai2k)
 
 ### Phân công công việc: 
-
-- Trần Đình Khôi
-  - [example]
-  - [example]
-- Nguyễn Hữu Khắc Phục
-  - [example]
-  - [example]
-- Phạm Mạnh Lợi
-  - [example]
-  - [example]
-- Ngô Văn Khải
-  - [example]
-  - [example]
+STT | MSSV | Mô tả công việc | Vai trò
+--- | --- | --- | --- |
+Trần Đình Khôi | 19521711 | - Thiết kế cơ sở dữ liệu <br/> - Front-end | Trưởng nhóm
+Nguyễn Hữu Khắc Phục | 19520851 | - Thiết kế giao diện web <br/> - Back-end <br/> - Front-end | Thành viên
+Phạm Mạnh Lợi | 19521772 | - Back-end <br/> - Front-end | Thành viên
+Ngô Văn Khải | 19520614 | - Thiết kế cơ sở dữ liệu <br/> - Triển khai ứng dụng web  | Thành viên
 
 ### Cài đặt 
 - Backend: 
@@ -52,10 +43,10 @@ Stun Store là website cung cấp miễn phí và mua bán các thể loại gam
 
 ### Công nghệ sử dụng
 - Design: Figma
-- Frontend: ReactJS, Redux, Firebase, SignalR,Login with Google
-- Backend: ASP.NET, JWT, Swagger, Entity Framework
+- Frontend: ReactJS (Typescript), Redux, Firebase, SignalR, Login with Google, ElectronJS (Javascript, Html, Css)
+- Backend: ASP.NET Core 3.1, JWT, Swagger, Entity Framework
 - Deploy: Docker, PM2 , NginX
-- Hệ quản trị cơ sở dữ liệu: SQL Server,chạy cronjob với SQL Agent
+- Hệ quản trị cơ sở dữ liệu: SQL Server, SQL Server Agent
 - Bot tự động update dữ liệu theo lịch trình  (nodejs)
     
 ### Chức năng đã có
@@ -63,7 +54,7 @@ Stun Store là website cung cấp miễn phí và mua bán các thể loại gam
 - Tìm kiếm game
 - Lọc game theo thể loại
 - Mua game,hoàn trả game
-- Đăng nhập, đăng kí (Email, Google, Facebook, ...)
+- Đăng nhập, đăng kí (Email, Google, ...)
 - Admin quản lý
 - Laucher chạy game và trải nghiệm
 - Đánh giá game qua comment, rating sau khi mua (realtime)
@@ -77,11 +68,9 @@ Stun Store là website cung cấp miễn phí và mua bán các thể loại gam
 
 ## Web API Stun Store  (English)
 
-### Link Diagram Database: [Click Here](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007)
+### Link Design: [Click Here](https://www.figma.com/file/PyrhA02MocSgTN3iHlh6Dm/WebGameDesign?node-id=0%3A1)
 
-### Link Design: [Click Here](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007))
-
-### Link Demo Web: [Click Here](https://lucid.app/lucidchart/d83a569e-b38a-4e3e-b08e-e44a05e217bd/edit?viewport_loc=-83%2C159%2C2275%2C1144%2C0_0&invitationId=inv_fd3bfe28-1efb-4b83-ae06-ed80e0699007))
+### Link Demo Web: [Click Here](http://stun-store.ngovankhai.site/)
 
 ### Team
 
@@ -92,18 +81,12 @@ Stun Store là website cung cấp miễn phí và mua bán các thể loại gam
 
 ### Tasks
 
-- Trần Đình Khôi
-  - [example]
-  - [example]
-- Nguyễn Hữu Khắc Phục
-  - [example]
-  - [example]
-- Phạm Mạnh Lợi
-  - [example]
-  - [example]
-- Ngô Văn Khải
-  - [example]
-  - [example]
+Serial | Student ID | Job Description | Role
+--- | --- | --- | --- |
+Tran Dinh Khoi | 19521711 | - Design Database <br/> - Front-end | Leader
+Nguyen Huu Khac Phuc | 19520851 | - Web UI Design <br/> - Back-end <br/> - Front-end | Member
+Pham Manh Loi | 19521772 | - Back-end <br/> - Front-end | Member
+Ngo Van Khai | 19520614 | - Design Database <br/> - Web Application Deployment  | Member
 
 ### How to run
 - Backend: 
@@ -126,23 +109,23 @@ Stun Store là website cung cấp miễn phí và mua bán các thể loại gam
 
 ### Description
 
-    ...
+Stun Store is a website providing free and buying and selling games online. The website interface is professionally designed with black as the main color to create a mysterious, powerful but equally attractive feeling, combined with eye-catching effects to create a new feeling for users. In addition, Stun Store supports users on all devices and can be adapted to all devices, large and small screen sizes. In addition to basic functions, Stun Store allows users to view and give reviews about game titles, increasing the user experience. Can play games and experience reality through laucher . If the game experience is not good or suitable, you can return the game according to the policy.
 
 ### Technology
 - Design: Figma
-- Frontend: ReactJS, Redux, Firebase, SignalR,Login with Google
-- Backend: ASP.NET, JWT, Swagger, Entity Framework
+- Frontend: ReactJS (Typescript), Redux, Firebase, SignalR,Login with Google, ElectronJS (Javascript, Html, Css)
+- Backend: ASP.NET Core 3.1, JWT, Swagger, Entity Framework
 - Deploy: Docker, PM2 , NginX
-- Database: SQL Server,chạy cronjob với SQL Agent
+- Database: SQL Server, SQL Server Agent
 
 ### Current Hepler: 
 - CRUD
 - Search game
 - Filter game by genres
 - Pay, refund game
-- Sign in, sign up (Email, Google, Facebook, ...)
-- Admin
-- Laucher run game and play game
+- Sign in, sign up (Email, Google, ...)
+- Admin manager
+- Laucher play game
 - Rating game after bought (realtime)
 - Bot auto update data on schedule (nodejs)
     
