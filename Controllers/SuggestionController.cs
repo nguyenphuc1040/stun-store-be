@@ -20,17 +20,13 @@ namespace game_store_be.Controllers
     {
         private readonly game_storeContext _context;
         private readonly IMapper _mapper;
+        private DiscoverGames gamesDiscover = new DiscoverGames();
         public SuggestionController(game_storeContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        [HttpGet]
-        public IActionResult GetAllSuggestion()
-        {
-            return Ok(_context.Suggestion.ToList());
-        }
         [AllowAnonymous]
         [HttpPost("create")]
         public IActionResult CreateNewSuggestion([FromBody] Suggestion newSuggestion)
@@ -87,6 +83,64 @@ namespace game_store_be.Controllers
             existGameDto.ImageGameDetail = _mapper.Map<ICollection<ImageGameDetailDto>>(existGame.First().ImageGameDetail.OrderBy(i=>i.Url));
             
             return existGameDto;
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult GetAllSuggestion(){
+           
+           string[] title = {
+               "Carousel","Top sellers","New release","Most favorite","Free games","Most popular",
+               "Top games week","Top games month","Game on sales","Free now"
+           };
+           foreach(string tit in title){
+               switch (tit) {
+                    case "Carousel":
+                        gamesDiscover.carousel = GetGamesSuggestion(tit, 5);
+                        break;
+                    case "Top sellers":
+                        gamesDiscover.topsellers = GetGamesSuggestion(tit, 5);
+                        break;
+                    case "New release":
+                        gamesDiscover.newReleases = GetGamesSuggestion(tit, 5);
+                        break;
+                    case "Most favorite":
+                        gamesDiscover.mostFavorite = GetGamesSuggestion(tit, 5);
+                        break;
+                    case "Free games":
+                        gamesDiscover.mostFavorite = GetGamesSuggestion(tit, 5);
+                        break;
+                    case "Most popular":
+                        gamesDiscover.mostPopular = GetGamesSuggestion(tit, 5);
+                        break;
+                    case "Top games week":
+                        gamesDiscover.topGamesWeek = GetGamesSuggestion(tit, 12);
+                        break;  
+                    case "Top games month":
+                        gamesDiscover.topGamesMonth = GetGamesSuggestion(tit, 12);
+                        break;
+                    case "Game on sales":
+                        gamesDiscover.gameOnSales = GetGamesSuggestion(tit, 5);
+                        break;
+                    case "Free now":
+                        gamesDiscover.freeNow = GetGamesSuggestion(tit, 5);
+                        break;
+               } 
+           }
+           return Ok(gamesDiscover);
+        }
+        private List<GameDto> GetGamesSuggestion(string title, int count){
+            var existSuggestion = _context.Suggestion
+                .FirstOrDefault(sg => sg.Title == title);
+            if (existSuggestion.Value == null) return null;
+            string[] listGameStr = existSuggestion.Value.Split(",");
+
+            List<GameDto> listGame = new List<GameDto>();
+            for (int i=0; i<count; i++) {
+                if (i>listGameStr.Length -1) break;
+                var game = GetGameById(listGameStr[i]);
+                if (game!=null) listGame.Add(game);
+            }
+            return listGame;
         }
         [AllowAnonymous]
         [HttpGet("get-game-suggestion-now")]
