@@ -89,8 +89,8 @@ namespace game_store_be.Controllers
         public IActionResult GetAllSuggestion(){
            
            string[] title = {
-               "Carousel","Top sellers","New release","Most favorite","Free games","Most popular",
-               "Top games week","Top games month","Game on sales","Free now"
+               "Carousel","Top games week","Free now","Top sellers","Free games","Game on sales","New release","Most favorite","Most popular",
+               "Top games month"
            };
            foreach(string tit in title){
                switch (tit) {
