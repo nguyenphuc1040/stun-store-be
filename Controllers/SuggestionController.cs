@@ -97,18 +97,6 @@ namespace game_store_be.Controllers
                     case "Carousel":
                         gamesDiscover.carousel = GetGamesSuggestion(tit, 5);
                         break;
-                    case "Top games week":
-                        gamesDiscover.topGamesWeek = GetGamesSuggestion(tit, 12);
-                        break;  
-                    case "Free now":
-                        gamesDiscover.freeNow = GetGamesSuggestion(tit, 5);
-                        break;
-                    case "Game on sales":
-                        gamesDiscover.gameOnSales = GetGamesSuggestion(tit, 5);
-                        break;
-                    case "Free games":
-                        gamesDiscover.mostFavorite = GetGamesSuggestion(tit, 5);
-                        break;
                     case "Top sellers":
                         gamesDiscover.topsellers = GetGamesSuggestion(tit, 5);
                         break;
@@ -118,8 +106,23 @@ namespace game_store_be.Controllers
                     case "Most favorite":
                         gamesDiscover.mostFavorite = GetGamesSuggestion(tit, 5);
                         break;
+                    case "Free games":
+                        gamesDiscover.mostFavorite = GetGamesSuggestion(tit, 5);
+                        break;
                     case "Most popular":
                         gamesDiscover.mostPopular = GetGamesSuggestion(tit, 5);
+                        break;
+                    case "Top games week":
+                        gamesDiscover.topGamesWeek = GetGamesSuggestion(tit, 12);
+                        break;  
+                    case "Top games month":
+                        gamesDiscover.topGamesMonth = GetGamesSuggestion(tit, 12);
+                        break;
+                    case "Game on sales":
+                        gamesDiscover.gameOnSales = GetGamesSuggestion(tit, 5);
+                        break;
+                    case "Free now":
+                        gamesDiscover.freeNow = GetGamesSuggestion(tit, 5);
                         break;
                } 
            }
