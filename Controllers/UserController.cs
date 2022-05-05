@@ -229,7 +229,7 @@ namespace game_store_be.Controllers
                 return NotFound("Stun ID already exist");
             }              
         }
-
+        [AllowAnonymous]
         [HttpPost("reset-password")]
         public IActionResult ResetPassword(){
             string idUser = HttpContext.Request.Headers["idUser"];
