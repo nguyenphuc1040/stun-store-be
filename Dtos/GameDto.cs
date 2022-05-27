@@ -29,7 +29,7 @@ namespace game_store_be.Dtos
         public ICollection<DetailGenreDto> Genres { get; set; }
         public ICollection<ImageGameDetailDto> ImageGameDetail { get; set; }
         public GameVersionDto NewVersion { get; set; }
-        public int[] Histogram {get; set;}
+        public float[] Histogram {get; set;}
 
     }
 }
