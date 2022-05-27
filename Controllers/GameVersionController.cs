@@ -108,7 +108,12 @@ namespace game_store_be.Controllers
             existGameDto.ImageGameDetail = imageDto;
             existGameversionDto.UrlDowload = null;
             existGameDto.NewVersion = existGameversionDto;
-
+            var listCmt = _context.Comments.Where(i => i.IdGame == idGame).ToList();
+            int[] histogram = new int[5];
+            foreach(var item in listCmt) {
+                histogram[(int)item.Star-1]++;
+            }
+            existGameDto.Histogram = histogram;
             return Ok(existGameDto);
         }
         [Authorize]
