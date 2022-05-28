@@ -71,8 +71,13 @@ namespace game_store_be.Controllers
             var newGameVersion = newGameBody.GameVersion;
             var listImageDetail = newGameBody.ListImageDetail;
             var listGenreDetail = newGameBody.ListGenreDetail;
-
-            var id = Guid.NewGuid().ToString();
+            string id;
+            if (newGameBody.Game.IdGame == "" || newGameBody.Game.IdGame == null){    
+                id = Guid.NewGuid().ToString();  
+            } else {
+                id = newGameBody.Game.IdGame;
+                
+            }
             newGame.IdGame = id;
             newGameVersion.IdGame = id;
             newGameVersion.IdGameVersion = Guid.NewGuid().ToString();

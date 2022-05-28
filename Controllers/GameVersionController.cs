@@ -106,7 +106,6 @@ namespace game_store_be.Controllers
             var existGameversionDto = _mapper.Map<GameVersion, GameVersionDto>(existGameVersion);
             var imageDto = _mapper.Map<ICollection<ImageGameDetailDto>>(imageDetail);
             existGameDto.ImageGameDetail = imageDto;
-            existGameversionDto.UrlDowload = null;
             existGameDto.NewVersion = existGameversionDto;
             var listCmt = _context.Comments.Where(i => i.IdGame == idGame).ToList();
             float[] histogram = new float[5];
